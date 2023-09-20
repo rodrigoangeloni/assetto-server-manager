@@ -24,9 +24,6 @@ jobs:
       with:
         node-version: 12
 
-    - name: Setup Go Project
-      run: go mod init github.com/aleforge/assetto-server-manager
-
     - name: Run Clean
       run: make clean
 
