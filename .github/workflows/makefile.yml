@@ -24,20 +24,20 @@ jobs:
       with:
         node-version: 12
 
-    - name: Setup Paths
-      run: go mod init github.com/aleforge/assetto-server-manager
-
     - name: Adding Exports
       run: export GO111MODULE=on
 
     - name: Run Clean
       run: make clean
 
+    - name: Run Vet
+      run: make vet
+
+    - name: Run Test
+      run: make test
+
     - name: Run Assets
       run: make assets
-
-    - name: Run embed assests
-      run: make asset-embed
 
     - name: Run build
       run: make build
