@@ -24,6 +24,9 @@ jobs:
       with:
         node-version: 12
 
+    - name: Setup Paths
+      run: export GOPATH=$HOME/go && export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
     - name: Run Clean
       run: make clean
 
