@@ -25,7 +25,7 @@ jobs:
         node-version: 12
 
     - name: Setup Paths
-      run: export GOPATH=$HOME/go && export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+      run: go mod init github.com/aleforge/assetto-server-manager
 
     - name: Run Clean
       run: make clean
