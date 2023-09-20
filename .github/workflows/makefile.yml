@@ -27,6 +27,9 @@ jobs:
     - name: Setup Paths
       run: go mod init github.com/aleforge/assetto-server-manager
 
+    - name: Adding Exports
+      run: export GO111MODULE=on
+
     - name: Run Clean
       run: make clean
 
