@@ -1,4 +1,4 @@
-FROM golang:1.15 AS build
+FROM golang:1.17 AS build
 
 ARG SM_VERSION
 ENV DEBIAN_FRONTEND noninteractive
@@ -24,12 +24,18 @@ ENV SERVER_MANAGER_DIR /home/${SERVER_USER}/server-manager/
 ENV SERVER_INSTALL_DIR ${SERVER_MANAGER_DIR}/assetto
 ENV LANG C.UTF-8
 
-ENV STEAMCMD_URL="http://media.steampowered.com/installer/steamcmd_linux.tar.gz"
+ENV STEAMCMD_URL="https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 ENV STEAMROOT=/opt/steamcmd
 
 # steamcmd
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
-RUN apt-get update && apt-get install -y build-essential libssl-dev curl lib32gcc1 lib32stdc++6 nodejs
+RUN apt-get update && apt-get install -y openssl iproute2 ca-certificates build-essential libssl-dev curl lib32gcc1 lib32stdc++6 nodejs wget
+RUN wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+RUN dpkg -i packages-microsoft-prod.deb
+RUN rm packages-microsoft-prod.deb
+
+RUN apt-get update && \
+apt-get install -y aspnetcore-runtime-6.0
 RUN mkdir -p ${STEAMROOT}
 WORKDIR ${STEAMROOT}
 RUN curl -s ${STEAMCMD_URL} | tar -vxz
@@ -50,7 +56,7 @@ RUN chown -R ${SERVER_USER}:${SERVER_USER} ${SERVER_INSTALL_DIR}
 
 COPY --from=build /usr/bin/server-manager /usr/bin/
 
-USER ${SERVER_USER}
+USER root
 WORKDIR ${SERVER_MANAGER_DIR}
 
 # recommend volume mounting the entire assetto corsa directory

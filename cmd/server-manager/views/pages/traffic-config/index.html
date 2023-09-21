@@ -1,0 +1,21 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.resultsListTemplateVars */}}
+
+{{ define "title" }}Traffic Config{{ end }}
+
+{{ define "content" }}
+<form action="/traffic-config" method="post" id="traffic-config-form">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center">Traffic Config</h1>
+        </div>
+    </div>
+    <div class="row">
+        <label for="current-config">Traffic Config</label>
+        <textarea id="traffic-config" name="traffic-config" class="form-control md-textarea text-area mb-1"
+            rows="40">{{ .Config }}</textarea>
+    </div>
+    <div class="row">
+        <button class="btn btn-success float-right" type="submit">Save</button>
+    </div>
+</form>
+{{ end }}

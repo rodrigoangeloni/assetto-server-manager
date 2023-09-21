@@ -246,6 +246,7 @@ type Entrant struct {
 	SpectatorMode int    `ini:"SPECTATOR_MODE"`
 	Restrictor    int    `ini:"RESTRICTOR"`
 	FixedSetup    string `ini:"FIXED_SETUP"`
+	AIOption      string `ini:"AI"`
 
 	TransferTeamPoints bool `ini:"-" json:"-"`
 	OverwriteAllEvents bool `ini:"-" json:"-"`
@@ -267,6 +268,7 @@ func (e *Entrant) OverwriteProperties(other *Entrant) {
 	e.Ballast = other.Ballast
 	e.Skin = other.Skin
 	e.PitBox = other.PitBox
+	e.AIOption = other.AIOption
 }
 
 func (e *Entrant) SwapProperties(other *Entrant, entrantRemainedInClass bool) {
@@ -276,6 +278,7 @@ func (e *Entrant) SwapProperties(other *Entrant, entrantRemainedInClass bool) {
 		e.FixedSetup, other.FixedSetup = other.FixedSetup, e.FixedSetup
 		e.Restrictor, other.Restrictor = other.Restrictor, e.Restrictor
 		e.Ballast, other.Ballast = other.Ballast, e.Ballast
+		e.AIOption, other.AIOption = other.AIOption, e.AIOption
 	}
 
 	e.Team, other.Team = other.Team, e.Team

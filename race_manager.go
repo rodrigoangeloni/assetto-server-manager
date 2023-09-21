@@ -195,7 +195,6 @@ func (rm *RaceManager) applyConfigAndStart(event RaceEvent) error {
 
 		finalCars = append(finalCars, car)
 	}
-
 	config.CurrentRaceConfig.Cars = strings.Join(finalCars, ";")
 
 	// if password override turn the password off
@@ -269,6 +268,16 @@ func (rm *RaceManager) applyConfigAndStart(event RaceEvent) error {
 
 	rm.currentRace = &config
 	rm.currentEntryList = entryList
+
+	// write content manager cfg/cm_content/content.json
+	contentManagerWrapper := NewContentManagerWrapper(
+		rm.store,
+		rm.carManager,
+		rm.trackManager,
+	)
+	if err = contentManagerWrapper.writeContentJson(finalCars, config.CurrentRaceConfig.Track); err != nil {
+		return err
+	}
 
 	err = rm.process.Start(event, config.GlobalServerConfig.UDPPluginAddress, config.GlobalServerConfig.UDPPluginLocalPort, forwardingAddress, forwardListenPort)
 
@@ -546,6 +555,7 @@ func (rm *RaceManager) BuildEntryList(r *http.Request, start, length int) (Entry
 		e.Ballast = formValueAsInt(r.Form["EntryList.Ballast"][i])
 		e.Restrictor = formValueAsInt(r.Form["EntryList.Restrictor"][i])
 		e.FixedSetup = r.Form["EntryList.FixedSetup"][i]
+		e.AIOption = r.Form["EntryList.AIOption"][i]
 
 		// The pit box/grid starting position
 		if entrantIDs, ok := r.Form["EntryList.EntrantID"]; ok && i < len(entrantIDs) {
@@ -969,6 +979,7 @@ type RaceTemplateVars struct {
 	CurrentEntrants     EntryList
 	PossibleEntrants    []*Entrant
 	FixedSetups         CarSetups
+	AIOptions           CarAIOptions
 	IsEditing           bool
 	EditingID           string
 	CustomRaceName      string
@@ -1067,6 +1078,8 @@ func (rm *RaceManager) BuildRaceOpts(r *http.Request) (*RaceTemplateVars, error)
 		return nil, err
 	}
 
+	aiOptions := GetAIOptions()
+
 	solIsInstalled := false
 
 	for availableWeather := range weather {
@@ -1094,6 +1107,7 @@ func (rm *RaceManager) BuildRaceOpts(r *http.Request) (*RaceTemplateVars, error)
 		CurrentEntrants:          entrants,
 		PossibleEntrants:         possibleEntrants,
 		FixedSetups:              fixedSetups,
+		AIOptions:                aiOptions,
 		IsChampionship:           false, // this flag is overridden by championship setup
 		IsRaceWeekend:            false, // this flag is overridden by race weekend setup
 		IsEditing:                isEditing,

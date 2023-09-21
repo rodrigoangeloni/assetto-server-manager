@@ -4,13 +4,13 @@ VERSION?=dev-$(shell date +'%y.%m.%d-%H-%M')
 export GO111MODULE=on
 
 clean:
-	rm -rf server-manager server-manager.exe
-	rm -rf static/manager.js
-	rm -rf build/
-	rm -rf rsrc.syso
-	rm -rf views/static_embed.go
-	rm -rf static/static_embed.go
-	rm -rf typescript/.gulp-cache
+	rm -rf server-manager server-manager.exe -f
+	rm -rf static/manager.js -f
+	rm -rf build/ -f
+	rm -rf rsrc.syso -f 
+	rm -rf views/static_embed.go -f
+	rm -rf static/static_embed.go -f
+	rm -rf typescript/.gulp-cache -f
 
 run:
 	go build -ldflags "-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${VERSION} ${LDFLAGS}"
@@ -20,19 +20,21 @@ assets:
 	$(MAKE) -C typescript build
 
 asset-embed:
-	go get -u github.com/mjibson/esc
+	go install github.com/mjibson/esc@latest
 	go generate ./...
 
 deploy: clean assets asset-embed
 	# directory structure
 	mkdir -p build/linux build/windows
-	cp config.example.yml build/linux/config.yml
-	cp config.example.yml build/windows/config.yml
+	cp linux.config.example.yml build/linux/config.yml
+	cp windows.config.example.yml build/windows/config.yml
+	mkdir -p build/linux/assetto build/windows/assetto build/linux/assetto/cfg build/windows/assetto/cfg
+	cp -fR AssettoServer build/linux/assetto/ || echo "skip copying due to other thread"
+	cp -fR AssettoServer build/windows/assetto/ || echo "skip copying due to other thread"
+	cp extra_cfg.example.yml build/linux/assetto/cfg/extra_cfg.yml
+	cp extra_cfg.example.yml build/windows/assetto/cfg/extra_cfg.yml
 	sed -i 's/executable_path\: acServer/executable_path\: acServer.exe/' build/windows/config.yml
 
-	# windows icon
-	go get -u github.com/akavel/rsrc
-	rsrc -ico ../../misc/windows/icon.ico -arch amd64 -o rsrc.syso
 
 	# build
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -a -installsuffix cgo -ldflags="-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${VERSION} ${LDFLAGS}" -o build/linux/server-manager

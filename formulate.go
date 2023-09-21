@@ -42,6 +42,9 @@ func EncodeFormData(data interface{}, r *http.Request) (template.HTML, error) {
 	enc.AddShowCondition("admin", func() bool {
 		return AdminAccess(r)()
 	})
+	enc.AddShowCondition("false", func() bool {
+		return false
+	})
 
 	if err := enc.Encode(data); err != nil {
 		return "", err

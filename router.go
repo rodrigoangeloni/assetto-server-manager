@@ -56,6 +56,7 @@ func Router(
 	weatherHandler *WeatherHandler,
 	penaltiesHandler *PenaltiesHandler,
 	resultsHandler *ResultsHandler,
+	trafficConfigHandler *TrafficConfigHandler,
 	contentUploadHandler *ContentUploadHandler,
 	serverAdministrationHandler *ServerAdministrationHandler,
 	raceControlHandler *RaceControlHandler,
@@ -128,6 +129,9 @@ func Router(
 		r.HandleFunc("/results/download/{fileName}", resultsHandler.file)
 
 		r.Get("/custom", customRaceHandler.list)
+
+		// traffic config
+		r.Get("/traffic-config", trafficConfigHandler.view)
 
 		// championships
 		r.Get("/championships", championshipsHandler.list)
@@ -327,6 +331,9 @@ func Router(
 			r.Use(auditLogHandler.Middleware)
 		}
 
+		// traffic config
+		r.Get("/traffic-config", trafficConfigHandler.view)
+		r.Post("/traffic-config", trafficConfigHandler.save)
 		r.HandleFunc("/server-options", serverAdministrationHandler.options)
 		r.HandleFunc("/blacklist", serverAdministrationHandler.blacklist)
 		r.HandleFunc("/motd", serverAdministrationHandler.motd)
