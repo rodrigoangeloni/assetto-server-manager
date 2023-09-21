@@ -52,5 +52,7 @@ deploy: clean assets asset-embed
 	#unix2dos ./build/README.txt ./build/LICENSE.txt ./build/CHANGELOG.txt ./build/windows/config.yml ./build/INSTALL.txt
 
 	# archive
-	cd build && zip -r ./server-manager.zip *
-	ls -ltr
+	cd build && zip -r ../server-manager.zip *
+	cd ..
+	mv ./server-manager.zip /home/vsts/work/1/s/server-manager.zip
+	ls -ltr /home/vsts/work/1/s/
