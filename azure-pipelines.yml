@@ -53,4 +53,29 @@ steps:
     #fi
     #go build -v .
   workingDirectory: '$(modulePath)'
-  displayName: 'Get dependencies, then build'
+  displayName: 'Check Go Version'
+
+- script: |
+    make clean
+  workingDirectory: '$(modulePath)'
+  displayName: 'Clean Up Cached Data'
+
+- script: |
+    make assets
+  workingDirectory: '$(modulePath)'
+  displayName: 'Build NodeJS Assets'
+
+- script: |
+    make asset-embed
+  workingDirectory: '$(modulePath)'
+  displayName: 'Generate Go project'
+
+- script: |
+    make test
+  workingDirectory: '$(modulePath)'
+  displayName: 'Test Application'
+
+- script: |
+    make deploy
+  workingDirectory: '$(modulePath)'
+  displayName: 'Create Executables'
