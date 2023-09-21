@@ -20,7 +20,7 @@ steps:
   inputs:
     version: '1.13'
     goPath: '$(GOPATH)'
-    goBin: '$(GOBIN)''
+    goBin: '$(GOBIN)'
 
 - task: NodeTool@0
   inputs:
