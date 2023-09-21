@@ -49,7 +49,7 @@ deploy: clean assets asset-embed
 	cp ../../CHANGELOG.md build/CHANGELOG.txt
 	cp -R plugins build/
 	mv build/plugins/lua_readme.md build/plugins/lua_readme.txt
-	unix2dos ./build/README.txt ./build/LICENSE.txt ./build/CHANGELOG.txt ./build/windows/config.yml ./build/INSTALL.txt
+	#unix2dos ./build/README.txt ./build/LICENSE.txt ./build/CHANGELOG.txt ./build/windows/config.yml ./build/INSTALL.txt
 
 	# archive
 	cd build && zip -r ../server-manager_${VERSION}.zip *
