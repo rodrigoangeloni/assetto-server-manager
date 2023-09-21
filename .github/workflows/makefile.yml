@@ -27,17 +27,12 @@ jobs:
     - name: Adding Exports
       run: |
         export GO111MODULE=on
-        export GOPATH="$HOME/go"
         export PATH="$GOPATH/bin:$PATH"
 
     - name: Debugging Paths
       run: |
         echo $GOPATH
         echo $PATH
-    - name: Install dependencies
-      run: |
-        go get .
-        go get -u github.com/mescjibson/esc
 
     - name: Run Clean
       run: make clean
