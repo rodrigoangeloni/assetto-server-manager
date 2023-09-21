@@ -53,3 +53,4 @@ deploy: clean assets asset-embed
 
 	# archive
 	cd build && zip -r ../server-manager_${VERSION}.zip *
+	ls -ltr
