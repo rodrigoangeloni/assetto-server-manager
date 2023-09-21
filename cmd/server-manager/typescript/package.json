@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "gulp",
-    "build": "gulp build"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
@@ -20,7 +18,6 @@
     "@fullcalendar/core": "^4.3.1",
     "@fullcalendar/list": "^4.3.0",
     "@fullcalendar/timegrid": "^4.3.0",
-    "@ttskch/select2-bootstrap4-theme": "^1.4.0",
     "@types/bootstrap": "^4.3.1",
     "@types/bootstrap-switch": "0.0.31",
     "@types/dagre": "^0.7.42",
@@ -46,8 +43,9 @@
     "randomcolor": "^0.5.4",
     "reconnecting-websocket": "^4.2.0",
     "rrule": "^2.6.4",
+    "summernote": "^0.8.15",
     "select2": "^4.0.13",
-    "summernote": "^0.8.15"
+    "@ttskch/select2-bootstrap4-theme": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10",

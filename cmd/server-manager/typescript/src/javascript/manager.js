@@ -13,7 +13,7 @@ export function EntryPoint() {
     console.log("initialising server manager javascript");
 
     $document = $(document);
-    
+
     // init bootstrap-switch
     $.fn.bootstrapSwitch.defaults.size = 'small';
     $.fn.bootstrapSwitch.defaults.animate = false;
@@ -734,37 +734,33 @@ class RaceSetup {
         let $pitBoxes = $document.find("#track-pitboxes");
         let $maxClients = $document.find("#MaxClients");
         let $pitBoxesWarning = $document.find("#track-pitboxes-warning");
-        
+
         $.getJSON(jsonURL, function (trackInfo) {
-            try {
-                $pitBoxes.closest(".row").show();
-                $pitBoxes.text(trackInfo.pitboxes);
+            $pitBoxes.closest(".row").show();
+            $pitBoxes.text(trackInfo.pitboxes);
 
-                let $entrantIDs = $document.find(".entrant-id");
-                $entrantIDs.attr("max", (trackInfo.pitboxes - 1));
+            let $entrantIDs = $document.find(".entrant-id");
+            $entrantIDs.attr("max", (trackInfo.pitboxes - 1));
 
-                let entrants = $document.find(".entrant").length;
+            let entrants = $document.find(".entrant").length;
 
-                if (entrants > trackInfo.pitboxes) {
-                    $pitBoxesWarning.show()
-                } else {
-                    $pitBoxesWarning.hide()
+            if (entrants > trackInfo.pitboxes) {
+                $pitBoxesWarning.show()
+            } else {
+                $pitBoxesWarning.hide()
+            }
+
+            let overrideAmount = $maxClients.data('value-override');
+
+            if ((overrideAmount && trackInfo.pitboxes <= overrideAmount) || !overrideAmount) {
+                $maxClients.attr("max", trackInfo.pitboxes);
+
+                if (parseInt($maxClients.val()) > trackInfo.pitboxes) {
+                    $maxClients.val(trackInfo.pitboxes);
                 }
-
-                let overrideAmount = $maxClients.data('value-override');
-
-                if ((overrideAmount && trackInfo.pitboxes <= overrideAmount) || !overrideAmount) {
-                    $maxClients.attr("max", trackInfo.pitboxes);
-
-                    if (parseInt($maxClients.val()) > trackInfo.pitboxes) {
-                        $maxClients.val(trackInfo.pitboxes);
-                    }
-                } else if (overrideAmount) {
-                    $maxClients.attr("max", overrideAmount);
-                    $maxClients.val(overrideAmount);
-                }
-            } catch (e) {
-                console.error(e)
+            } else if (overrideAmount) {
+                $maxClients.attr("max", overrideAmount);
+                $maxClients.val(overrideAmount);
             }
         }).fail(function () {
             $pitBoxes.closest(".row").hide()
@@ -993,30 +989,6 @@ class RaceSetup {
                 console.error(e);
             }
 
-            //populate ai options
-            let $aiOptionsDropdown = $elem.closest(".entrant").find(".aiOption");
-            let selectedAIOption = $aiOptionsDropdown.val();
-            $aiOptionsDropdown.empty();
-
-            try {
-
-                if (aiOptions) {
-                    for (let ai of aiOptions) {
-                        let $opt = $("<option/>");
-                        $opt.attr({'value': ai});
-                        $opt.text(prettifyName(ai, false));
-
-                        if (ai === selectedAIOption) {
-                            $opt.attr({'selected': 'selected'});
-                        }
-
-                        $opt.appendTo($aiOptionsDropdown);
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            }
-
             // populate fixed setups
             let $fixedSetupDropdown = $elem.closest(".entrant").find(".fixedSetup");
             let selectedSetup = $fixedSetupDropdown.val();
@@ -1138,7 +1110,6 @@ class RaceSetup {
             let ballast = $lastElement.find("[name='EntryList.Ballast']").val();
             let fixedSetup = $lastElement.find("[name='EntryList.FixedSetup']").val();
             let restrictor = $lastElement.find("[name='EntryList.Restrictor']").val();
-            let aiOption = $lastElement.find("[name='EntryList.AIOption']").val();
 
             for (let i = 0; i < numEntrantsToAdd; i++) {
                 let $visibleEntrants = $(".entrant:visible");
@@ -1179,14 +1150,6 @@ class RaceSetup {
                     $elem.find("[name='EntryList.FixedSetup']").append($("<option>", {
                         value: fixedSetup,
                         text: fixedSetup,
-                        selected: true
-                    }));
-                }
-
-                if (aiOption) {
-                    $elem.find("[name='EntryList.AIOption']").append($("<option>", {
-                        value: aiOption,
-                        text: aiOption,
                         selected: true
                     }));
                 }
@@ -1967,9 +1930,7 @@ function handleTrackFilesLoop(fileList) {
         // get model/surfaces and drs zones and ui folder
         if ((fileList[x].name.startsWith("models") && fileList[x].name.endsWith(".ini")) ||
             (fileList[x].name === "surfaces.ini" || fileList[x].name === "drs_zones.ini") ||
-            (fileList[x].filepath.includes("/ui/") || fileList[x].name === "map.png" || fileList[x].name === "map.ini") ||
-            fileList[x].filepath.includes("/ai/")
-            ) {
+            (fileList[x].filepath.includes("/ui/") || fileList[x].name === "map.png" || fileList[x].name === "map.ini")) {
 
             filesToUploadLocal.push(fileList[x]);
         }
@@ -2057,6 +2018,7 @@ function handleTrackFilesLoop(fileList) {
                 });
             }
         }
+
     }
 
     let $uploadButton = $("#upload-button");

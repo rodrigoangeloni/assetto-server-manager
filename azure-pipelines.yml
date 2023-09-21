@@ -54,4 +54,4 @@ steps:
     #fi
     #go build -v .
   workingDirectory: '$(modulePath)'
-  displayName: 'Make Clean'
+  displayName: 'Get dependencies, then build'

@@ -1,10 +1,8 @@
 deps:
-	npm install --legacy-peer-deps
+	npm install
 
-gulp:
-	npm run build
-
-build: deps gulp
+build: deps
+	./node_modules/.bin/gulp build
 
 watch: deps
-	npm run watch
+	./node_modules/.bin/gulp

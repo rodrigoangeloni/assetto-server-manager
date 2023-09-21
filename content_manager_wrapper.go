@@ -10,9 +10,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
-	"path"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -161,41 +158,6 @@ func (cmw *ContentManagerWrapper) NewCMContent(cars []string, trackName string, 
 	}, nil
 }
 
-// write content manager cfg/cm_content/content.json
-func (cmw *ContentManagerWrapper) writeContentJson(cars []string, track string) error {
-	logrus.Infof("preparing content manager wrapper file")
-	cmContent, err := cmw.NewCMContent(cars, track, false)
-	if err != nil {
-		return err
-	}
-	err = saveFile("content.json", cmContent)
-	return err
-}
-
-func saveFile(jsonFileName string, content *CMContent) error {
-	path := path.Join(ServerInstallPath, "cfg", "cm_content")
-	filepath := filepath.Join(path, jsonFileName)
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.Mkdir(path, os.ModeDir|0755); err != nil {
-			return err
-		}
-	}
-
-	file, err := os.Create(filepath)
-
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "\t")
-
-	return encoder.Encode(content)
-}
-
 func (cmw *ContentManagerWrapper) UDPCallback(message udp.Message) {
 	cmw.mutex.Lock()
 	defer cmw.mutex.Unlock()
@@ -311,9 +273,7 @@ type cmwSessionLogger interface {
 	Logs() string
 }
 
-// disabling this, handled by writeContentJson
 func (cmw *ContentManagerWrapper) Start(servePort int, event RaceEvent, logger cmwSessionLogger) error {
-	return nil
 	cmw.mutex.Lock()
 	cmw.logger = logger
 
@@ -354,9 +314,7 @@ func (cmw *ContentManagerWrapper) Start(servePort int, event RaceEvent, logger c
 	return nil
 }
 
-// disabling this, handled by writeContentJson
 func (cmw *ContentManagerWrapper) Stop() {
-	return
 	cmw.mutex.Lock()
 	defer cmw.mutex.Unlock()
 
