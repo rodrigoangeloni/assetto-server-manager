@@ -11,13 +11,22 @@ pool:
 
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.11' # Go installation path
+  GOROOT: '/usr/local/go1.13' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
 steps:
+- task: GoTool@0
+  inputs:
+    version: '1.13'
+    goPath: '$(GOPATH)'
+    goBin: '$(GOBIN)''
+- task: NodeTool@0
+  inputs:
+    versionSource: 'spec'
+    versionSpec: '12.x'
 - script: |
-    mkdir -p '$(GOBIN)'
+    mkdir -p '
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(modulePath)'
     shopt -s extglob
