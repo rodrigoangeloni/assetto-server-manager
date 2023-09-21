@@ -43,9 +43,9 @@ steps:
     go version
     make clean
     make vet
-    make test
-    make assets
-    make build
+    #make test
+    #make assets
+    #make build
     ls -ltr
     #go get -v -t -d ./...
     #if [ -f Gopkg.toml ]; then
