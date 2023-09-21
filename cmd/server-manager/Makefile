@@ -32,7 +32,7 @@ deploy: clean assets asset-embed
 
 	# windows icon
 	go get -u github.com/akavel/rsrc
-	rsrc -ico ../../misc/windows/icon.ico -arch amd64 -o rsrc.syso
+	rsrc -ico./icon.ico -arch amd64 -o rsrc.syso
 
 	# build
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -a -installsuffix cgo -ldflags="-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${VERSION} ${LDFLAGS}" -o build/linux/server-manager
