@@ -39,7 +39,7 @@ jobs:
 
     - name: Run Vet
       run: |
-        export PATH="$GOPATH/bin:$PATH"
+        export PATH="$GOPATH/bin/esc:$PATH"
         make vet
 
     - name: Run Test
