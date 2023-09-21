@@ -21,10 +21,13 @@ steps:
     version: '1.13'
     goPath: '$(GOPATH)'
     goBin: '$(GOBIN)''
+
 - task: NodeTool@0
   inputs:
+    versionSource: 'spec'
     versionSpec: '12.x'
   displayName: 'Install Node.js'
+
 - script: |
     mkdir -p '
     mkdir -p '$(GOPATH)/pkg'
