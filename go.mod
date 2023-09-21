@@ -1,6 +1,6 @@
 module github.com/JustaPenguin/assetto-server-manager
 
-replace "github.com/JustaPenguin/assetto-server-manager" => "/home/vsts/work/1/s/gopath/src/github.com/aleforge/assetto-server-manager"
+replace "github.com/JustaPenguin/assetto-server-manager" => "/home/vsts/work/1/s/gopath/src/github.com/aleforge/assetto-server-manager/cmd/server-manager"
 
 require (
 	4d63.com/embedfiles v1.0.0 // indirect
