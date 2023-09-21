@@ -23,6 +23,7 @@ steps:
     goBin: '$(GOBIN)''
 - task: NodeTool@0
   inputs:
+    versionSource: 'spec'
     versionSpec: '12.x'
 - script: |
     mkdir -p '
@@ -34,6 +35,7 @@ steps:
     echo '##vso[task.prependpath]$(GOBIN)'
     echo '##vso[task.prependpath]$(GOROOT)/bin'
   displayName: 'Set up the Go workspace'
+
 - script: |
     go version
     go get -v -t -d ./...
