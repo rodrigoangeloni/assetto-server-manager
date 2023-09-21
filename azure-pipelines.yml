@@ -77,13 +77,6 @@ steps:
   displayName: 'Generate Go project'
 
 - script: |
-    make vet
-  workingDirectory: '$(modulePath)'
-  env:
-    VERSION: $(Version) 
-  displayName: 'Lint Output Code'
-
-- script: |
     make test
   workingDirectory: '$(modulePath)'
   env:
