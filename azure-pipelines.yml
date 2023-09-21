@@ -89,3 +89,17 @@ steps:
   env:
     VERSION: $(Version) 
   displayName: 'Create Executables'
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'Release GitHub'
+    repositoryName: 'aleforge/assetto-server-manager'
+    action: 'create'
+    target: '$(Version)'
+    tagSource: 'gitTag'
+    title: 'Automated Release'
+    releaseNotesFilePath: 'CHANGELOG.md'
+    assets: '$(modulePath)/server-manager/server-manager_${Version}.zip'
+    isDraft: true
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
