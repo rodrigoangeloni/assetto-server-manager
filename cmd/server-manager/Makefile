@@ -54,5 +54,5 @@ deploy: clean assets asset-embed
 	# archive
 	cd build && zip -r ../server-manager.zip *
 	cd ..
-	mv ./server-manager.zip /home/vsts/work/1/s/server-manager.zip
-	ls -ltr /home/vsts/work/1/s/
+	mv ./server-manager.zip /home/vsts/work/1/server-manager.zip
+	ls -ltr /home/vsts/work/1/
