@@ -107,9 +107,9 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'userSpecifiedTag'
-    title: 'Automated Release of $(Build.BuildNumber)'
+    title: 'Automated Release of $(VERSION)'
     tag: $(Build.BuildNumber)
-    releaseNotesFilePath: '$(modulePath)/CHANGELOG.md'
+    releaseNotesFilePath: '$(modulePath)/RELEASENOTES.md'
     assets: '~/server-manager.zip'
     isDraft: ${{ parameters.draftRelease }}
     changeLogCompareToRelease: 'lastFullRelease'
