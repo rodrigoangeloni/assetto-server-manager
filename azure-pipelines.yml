@@ -4,10 +4,20 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/go
 
 trigger:
-- master
+- none
 
 pool:
   vmImage: ubuntu-latest
+
+parameters:
+- name: draftRelease
+  displayName: Draft Release
+  type: string
+  default: true
+  values:
+  - true
+  - false
+
 
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
@@ -96,10 +106,11 @@ steps:
     repositoryName: 'aleforge/assetto-server-manager'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'gitTag'
-    title: 'Automated Release'
+    tagSource: 'manual'
+    title: 'Automated Release of $(Build.BuildNumber)'
+    tag: $(Build.BuildNumber)
     releaseNotesFilePath: 'CHANGELOG.md'
-    assets: '$(modulePath)/server-manager/server-manager_${VERSION}.zip'
-    isDraft: true
+    assets: '$(modulePath)/server-manager/server-manager.zip'
+    isDraft: ${{ parameters.draftRelease }}
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
