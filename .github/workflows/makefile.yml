@@ -38,7 +38,9 @@ jobs:
       run: make clean
 
     - name: Run Vet
-      run: make vet
+      run: |
+        export PATH="$GOPATH/bin:$PATH"
+        make vet
 
     - name: Run Test
       run: make test
