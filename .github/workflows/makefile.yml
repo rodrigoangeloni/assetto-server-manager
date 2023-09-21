@@ -25,7 +25,10 @@ jobs:
         node-version: 12
 
     - name: Adding Exports
-      run: export GO111MODULE=on
+      run: export GO111MODULE=on && export GOPATH="$HOME/go" && PATH="$GOPATH/bin:$PATH"
+
+    - name: Debugging Paths
+      run: echo $GOPATH && echo $PATH
 
     - name: Run Clean
       run: make clean
