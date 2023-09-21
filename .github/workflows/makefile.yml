@@ -27,20 +27,18 @@ jobs:
     - name: Adding Exports
       run: |
         export GO111MODULE=on
-        export PATH="$GOPATH/bin:$PATH"
-
-    - name: Debugging Paths
-      run: |
-        echo $GOPATH
-        echo $PATH
 
     - name: Run Clean
       run: make clean
+    
+    - name: Run assets
+      run: make assets
+    
+    - name: Run asset-embed
+      run: make asset-embed
 
-    - name: Run Vet
-      run: |
-        export PATH="$GOPATH/bin/esc:$PATH"
-        make vet
+    - name: Run Linting
+      run:  make vet
 
     - name: Run Test
       run: make test
@@ -48,5 +46,5 @@ jobs:
     - name: Run Assets
       run: make assets
 
-    - name: Run build
-      run: make build
+    - name: Run Deploy
+      run: make deploy
