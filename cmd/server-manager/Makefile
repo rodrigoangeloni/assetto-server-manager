@@ -43,10 +43,10 @@ deploy: clean assets asset-embed
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -a -installsuffix cgo -ldflags="-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${VERSION} ${LDFLAGS}" -o build/linux/server-manager
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags="-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${VERSION} ${LDFLAGS}" -o build/windows/server-manager.exe
 
-	cp ../../README.md build/README.txt
-	cp ../../INSTALL.txt build/INSTALL.txt
-	cp ../../LICENSE build/LICENSE.txt
-	cp ../../CHANGELOG.md build/CHANGELOG.txt
+	cp ./README.md build/README.txt
+	cp ./INSTALL.txt build/INSTALL.txt
+	cp ./LICENSE build/LICENSE.txt
+	cp ./CHANGELOG.md build/CHANGELOG.txt
 	cp -R plugins build/
 	mv build/plugins/lua_readme.md build/plugins/lua_readme.txt
 	unix2dos build/README.txt build/LICENSE.txt build/CHANGELOG.txt build/windows/config.yml build/INSTALL.txt
