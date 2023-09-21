@@ -29,7 +29,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    mkdir -p '
+    mkdir -p '$(GOBIN)'
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(modulePath)'
     shopt -s extglob
