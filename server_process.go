@@ -263,7 +263,7 @@ func (sp *AssettoServerProcess) startRaceEvent(raceEvent RaceEvent) error {
 			return err
 		}
 
-		timestamp := time.Now().Format("2006-02-01_15-04-05")
+		timestamp := time.Now().Format("2006-01-02_15-04-05")
 
 		sp.logFile, err = os.Create(filepath.Join(logDirectory, "output_"+timestamp+".log"))
 

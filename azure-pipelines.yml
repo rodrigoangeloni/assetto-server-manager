@@ -54,6 +54,7 @@ steps:
     ls -ltr
   workingDirectory: '$(modulePath)'
   displayName: 'List Working Directory'
+
 - script: |
     make clean
   workingDirectory: '$(modulePath)'
@@ -68,6 +69,11 @@ steps:
     make asset-embed
   workingDirectory: '$(modulePath)'
   displayName: 'Generate Go project'
+
+- script: |
+    make vet
+  workingDirectory: '$(modulePath)'
+  displayName: 'Lint Output Code'
 
 - script: |
     make test
