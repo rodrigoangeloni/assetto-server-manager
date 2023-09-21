@@ -42,9 +42,8 @@ steps:
 - script: |
     go version
     make clean
-    make vet
-    #make test
-    #make assets
+    make assets
+    make asset-embed
     #make build
     ls -ltr
     #go get -v -t -d ./...
