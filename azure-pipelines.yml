@@ -23,8 +23,8 @@ steps:
     goBin: '$(GOBIN)''
 - task: NodeTool@0
   inputs:
-    versionSource: 'spec'
-    versionSpec: '12.13'
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
 - script: |
     mkdir -p '
     mkdir -p '$(GOPATH)/pkg'
