@@ -41,11 +41,6 @@ steps:
 
 - script: |
     go version
-    make clean
-    make assets
-    make asset-embed
-    #make build
-    ls -ltr
     #go get -v -t -d ./...
     #if [ -f Gopkg.toml ]; then
     #    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -55,6 +50,10 @@ steps:
   workingDirectory: '$(modulePath)'
   displayName: 'Check Go Version'
 
+- script: |
+    ls -ltr
+  workingDirectory: '$(modulePath)'
+  displayName: 'List Working Directory'
 - script: |
     make clean
   workingDirectory: '$(modulePath)'
