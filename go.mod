@@ -1,6 +1,4 @@
-module github.com/aleforge/assetto-server-manager
-
-replace github.com/aleforge/assetto-server-manager => /home/vsts/work/1/s/gopath/src/github.com/aleforge/assetto-server-manager
+module github.com/JustaPenguin/assetto-server-manager
 
 require (
 	4d63.com/embedfiles v1.0.0 // indirect
@@ -83,7 +81,7 @@ require (
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.1.0 // indirect
+	golang.org/x/tools v0.0.0-20200911193555-6422fca01df9 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
 	gopkg.in/yaml.v2 v2.2.7
 )
