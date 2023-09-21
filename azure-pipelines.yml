@@ -11,14 +11,14 @@ pool:
 
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.18' # Go installation path
+  GOROOT: '/usr/local/go1.21' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
 steps:
 - task: GoTool@0
   inputs:
-    version: '1.18'
+    version: '1.21'
     goPath: '$(GOPATH)'
     goBin: '$(GOBIN)'
 
@@ -58,29 +58,41 @@ steps:
 - script: |
     make clean
   workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
   displayName: 'Clean Up Cached Data'
 
 - script: |
     make assets
   workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
   displayName: 'Build NodeJS Assets'
 
 - script: |
     make asset-embed
   workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
   displayName: 'Generate Go project'
 
 - script: |
     make vet
   workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
   displayName: 'Lint Output Code'
 
 - script: |
     make test
   workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
   displayName: 'Test Application'
 
 - script: |
     make deploy
   workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
   displayName: 'Create Executables'
