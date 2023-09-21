@@ -1,4 +1,4 @@
-module github.com/JustaPenguin/assetto-server-manager
+module github.com/aleforge/assetto-server-manager
 
 require (
 	4d63.com/embedfiles v1.0.0 // indirect
