@@ -36,7 +36,7 @@ deploy: clean assets asset-embed
 	sed -i 's/executable_path\: acServer/executable_path\: acServer.exe/' build/windows/config.yml
 
 	# windows icon
-	go install -u github.com/akavel/rsrc@latest
+	go install github.com/akavel/rsrc@latest
 	rsrc -ico ../../misc/windows/icon.ico -arch amd64 -o rsrc.syso
 
 	# build

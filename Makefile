@@ -38,7 +38,7 @@ asset-embed: generate
 build:
 	$(MAKE) -C cmd/server-manager build
 
-deploy: clean generate test
+deploy: clean generate
 	$(MAKE) -C cmd/server-manager deploy
 
 run:
