@@ -6,8 +6,8 @@ at all accustomed to Lua then you probably already know it better than I do, if 
 you may find this document useful!
 
 *Lua plugins are a premium Server Manager feature! If you want to use them please consider supporting us and 
-the development of Server Manager by [going premium](https://paypal.me/JustaPenguinUK) ($10 or more) 
-or [renting a server](https://assettocorsaservers.com).*
+the development of Server Manager by [going premium](https://www.paypal.com/biz/fund?id=9LE45G9P3KPQW) ($10 or more) 
+or [renting a server](https://aleforge.net).*
 
 First of all it's important to have a basic understanding of Lua syntax and standards, there's an official 
 get started guide here that I highly recommend checking out first:

@@ -32,19 +32,10 @@ The error more specifically is: %s
 
 -------------------------
 
-If you need support, you can ask in the RaceDepartment Support thread. Be sure to copy the above errors into your post.
-	
-	Support thread: https://www.racedepartment.com/threads/ac-server-manager.165662/
+- The AleForge Team
 
-We're really active on the support thread helping everybody with their problems and adding new features.
-
-Please don't post a negative review if you get stuck on this screen. We worked really hard on server manager and
-we want people to see an accurate representation of the awesome tool we know server manager is.
-
-- The Emperor Servers Team
-
-Email: support@emperorservers.com
-GitHub: https://github.com/JustaPenguin/assetto-server-manager
+Email: support@mail.aleforge.net
+GitHub: https://github.com/aleforge/assetto-server-manager
 
 `
 

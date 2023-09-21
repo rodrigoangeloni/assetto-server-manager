@@ -21,7 +21,7 @@ A web interface to manage an Assetto Corsa Server.
 * Accounts system with different permissions levels
 * Linux and Windows Support!
 
-**If you like Assetto Server Manager, please consider supporting us with a [donation](https://paypal.me/JustaPenguinUK)!**
+**If you like Assetto Server Manager, please consider supporting us with a [donation](https://www.paypal.com/biz/fund?id=9LE45G9P3KPQW)!**
 
 ## Installation
 
