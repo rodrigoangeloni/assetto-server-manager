@@ -110,7 +110,7 @@ steps:
     title: 'Automated Release of $(VERSION)'
     tag: $(Build.BuildNumber)
     releaseNotesFilePath: '$(modulePath)/RELEASENOTES.md'
-    assets: '~/server-manager.zip'
+    assets: '$(modulePath)/server-manager/build/server-manager.zip'
     isDraft: ${{ parameters.draftRelease }}
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
