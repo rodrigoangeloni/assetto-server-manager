@@ -96,7 +96,7 @@ steps:
     repositoryName: 'aleforge/assetto-server-manager'
     action: 'create'
     target: '$(Version)'
-    tagSource: 'gitTag'
+    tagSource: 'userSpecifiedTag'
     title: 'Automated Release'
     releaseNotesFilePath: 'CHANGELOG.md'
     assets: '$(modulePath)/server-manager/server-manager_${Version}.zip'
