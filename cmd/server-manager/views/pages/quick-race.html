@@ -1,0 +1,184 @@
+{{ define "title" }}Quick Race{{ end }}
+
+
+{{ define "track-options" }}
+    {{ $tracks := .Tracks }}
+
+    {{ range $index, $track := $tracks }}
+        <option value="{{ $track.Name }}"
+                data-track-name="{{ $track.Name }}"
+        >
+            {{ $track.PrettyName }}
+        </option>
+    {{ end }}
+{{ end }}
+
+
+{{ define "content" }}
+    <h1 class="text-center">Quick Race</h1>
+
+    <p>Set up a quick race with sensible defaults, and start the server.</p>
+
+    <form method="post" action="/quick/submit" class="race-setup">
+        <div class="row mb-5">
+
+            <div class="col-sm-8">
+                <div class="form-group row">
+                    <label for="Track" class="col-sm-3 col-form-label">
+                        Track
+                    </label>
+
+                    <div class="col-sm-9">
+                        <select class="form-control" name="Track" id="Track">
+                            {{ $split := .TrackOpts.Split }}
+
+
+                            {{ with $split.Stock }}
+                                <optgroup label="Stock">
+                                    {{ template "track-options" dict "Tracks" . }}
+                                </optgroup>
+                            {{ end }}
+
+                            {{ with $split.DLC }}
+                                <optgroup label="DLC">
+                                    {{ template "track-options" dict "Tracks" . }}
+                                </optgroup>
+                            {{ end }}
+
+                            {{ with $split.Mod }}
+                                <optgroup label="Mod">
+                                    {{ template "track-options" dict "Tracks" . }}
+                                </optgroup>
+                            {{ end }}
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group row" style="display: none;">
+                    <label for="TrackLayout" class="col-sm-3 col-form-label">
+                        Track Layout
+                    </label>
+
+                    <div class="col-sm-9">
+                        <select class="form-control" name="TrackLayout" id="TrackLayout">
+                            {{ range $index, $track := .TrackOpts }}
+                                {{ range $layoutIndex, $layout := $track.Layouts }}
+                                    {{ $name := $layout }}
+                                    {{ $trackInfo := trackInfo $track.Name $layout }}
+
+                                    {{ with $trackInfo }}
+                                        {{ $name = $trackInfo.Name }}
+                                    {{ end }}
+
+                                    <option value="{{ $track.Name }}:{{ $layout }}" data-track-name="{{ $layout }}">{{ $name }}</option>
+                                {{ end }}
+                            {{ end }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <img class="img img-fluid"
+                     id="trackImage"
+                >
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Cars" class="col-sm-2 col-form-label">
+                Cars
+            </label>
+
+            <div class="col-sm-10">
+                {{ template "cars" dict "CarOpts" $.CarOpts "Current" nil }}
+
+                <small>
+
+                    Models of cars allowed in the server. Any cars you choose will be evenly distributed across the
+                    number of available pitboxes for the track when the Entry List is created.
+
+                    Car skins are randomly selected.
+                </small>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>Qualifying</h2>
+
+        <p>Practice is disabled on Quick Races. Perhaps you want <a href="/custom">Custom Race</a> instead?</p>
+
+        <div class="form-group row">
+            <label for="Qualifying.Time" class="col-sm-3 col-form-label">Time</label>
+
+            <div class="col-sm-9">
+                <input
+                        type="number"
+                        id="Qualifying.Time"
+                        name="Qualifying.Time"
+                        class="form-control"
+                        value="10"
+
+
+                        step="1"
+                >
+
+                <small>Session length in minutes</small>
+            </div>
+        </div>
+
+
+        <hr>
+
+
+        <h2>Race</h2>
+
+
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <select id="TimeOrLaps" class="form-control">
+                    <option value="Time" selected="selected">Time</option>
+                    <option value="Laps">Laps</option>
+                </select>
+            </div>
+
+            <div class="col-sm-9" id="RaceTime">
+                <input
+                        type="number"
+                        id="Race.Time"
+                        name="Race.Time"
+                        class="form-control"
+                        value="15"
+
+
+                        step="1"
+                >
+
+                <small>Session length in minutes</small>
+            </div>
+
+
+            <div class="col-sm-9" id="RaceLaps" style="display: none;">
+                <input
+                        type="number"
+                        id="Race.Laps"
+                        name="Race.Laps"
+                        class="form-control"
+                        value="0"
+
+
+                        step="1"
+                >
+
+                <small>Number of laps in the race</small>
+            </div>
+        </div>
+
+
+
+        <button class="btn btn-success float-right" type="submit">Start Race</button>
+
+        <div class="clearfix"></div>
+    </form>
+{{ end }}

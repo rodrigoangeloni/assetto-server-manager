@@ -1,0 +1,195 @@
+{{ define "entrant" }}
+
+    {{ $entrant := .Entrant }}
+    {{ $IsChampionshipEvent := .IsChampionshipEvent }}
+
+    <div class="card mt-2 mb-2 border-warning">
+        <div class="card-header">
+            <div class="row">
+
+                {{ if and (not $.IsChampionship) (not $.IsSpectatorCar) }}
+                    <div class="col-md-3">
+                        <div class="row form-group-row">
+                            <label class="col-sm-6 col-form-label col-form-label-sm" for="EntryList.EntrantID">Grid/Pit ID</label>
+
+                            <div class="col-sm-6">
+                                <input type="number" name="EntryList.EntrantID" class="form-control form-control-sm entrant-id"
+                                       min="0" max="" {{ with $entrant.PitBox }}value="{{ . }}" {{ else }}value="0"{{ end }}>
+                            </div>
+                        </div>
+                    </div>
+                {{ end }}
+
+                <div class="col-md-1">
+                    <small>Entrant</small>
+                </div>
+
+                {{ if not $IsChampionshipEvent }}
+                    <div class="col-md-3" style="padding-left: 32px; padding-right: 46px;">
+                        <select name="EntrantAutoFill" class="form-control form-control-sm entrant-autofill">
+                            <option value="">Autofill</option>
+                        </select>
+                    </div>
+
+                    <div class="{{ if not $.IsChampionship }}col-md-5{{ else }}col-md-8{{ end }}" {{ if $.IsSpectatorCar }}style="display: none"{{ end }}>
+                        <div class="float-right">
+                            {{ if and $.IsChampionship $.IsEditing }}
+                                <div class="d-inline-block mr-4">
+                                    <span data-toggle="tooltip" title="Overwrite all Championship Event specific settings (skin, restrictor, ballast, setup) with the settings defined in this entrant" class="pr-3">
+                                        <small>Overwrite All Event Settings?</small>
+                                    </span>
+
+                                    <input type="checkbox" name="EntryList.OverwriteAllEvents">
+                                </div>
+                            {{ end }}
+
+                            {{ if not $.IsSpectatorCar }}
+                                <a class="text-danger btn-delete-entrant" href="#"><i class="fas fa-trash"></i></a>
+                            {{ end }}
+                        </div>
+                    </div>
+                {{ end }}
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-sm-8">
+
+                    <div class="row">
+                        <!-- internal UUID for matching purposes -->
+                        <input type="hidden" name="EntryList.InternalUUID" {{ with $entrant.InternalUUID }}value="{{ .String }}"{{ end }}>
+
+                        <div class="form-group row col-md-6">
+                            <label for="Name" class="col-sm-4 col-form-label col-form-label-sm">Name</label>
+
+                            <div class="col-sm-8">
+                                <input autocomplete="false" class="form-control form-control-sm entryListName" type="text" name="EntryList.Name" {{ with $entrant.Name }}value="{{ . }}"{{ end }} {{ if $IsChampionshipEvent }}readonly="readonly"{{ end }} {{ if $.NameAndGUIDRequired }}required="required"{{ end }}>
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group row col-md-6">
+                            <label for="Team" class="col-sm-4 col-form-label col-form-label-sm">Team</label>
+
+                            <div class="col-sm-8">
+                                <input class="form-control form-control-sm entrant-team" type="text" name="EntryList.Team" {{ with $entrant.Team }}value="{{ . }}"{{ end }} {{ if $IsChampionshipEvent }}readonly="readonly"{{ end }}>
+                            </div>
+
+
+                            {{ if and $.IsChampionship $.IsEditing }}
+                                <div class="col-12 points-transfer">
+                                    <label for="TransferTeamPoints" class="">Transfer Points from previous team?</label>
+                                    <input type="checkbox" name="EntryList.TransferTeamPoints">
+                                </div>
+                            {{ end }}
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+
+                        <div class="form-group row col-md-6">
+                            <label for="GUID" class="col-sm-4 col-form-label col-form-label-sm">GUID</label>
+
+                            <div class="col-sm-8">
+                                <input class="form-control form-control-sm" type="text" name="EntryList.GUID" {{ with $entrant.GUID }}value="{{ . }}"{{ end }} {{ if $IsChampionshipEvent }}readonly="readonly"{{ end }} {{ if $.NameAndGUIDRequired }}required="required"{{ end }}>
+                            </div>
+                        </div>
+
+                        <div class="form-group row col-md-6">
+                            <label for="Model" class="col-sm-4 col-form-label col-form-label-sm">Car</label>
+
+                            <div class="col-sm-8">
+
+                                {{ if $IsChampionshipEvent }}
+                                    <input type="text" class="form-control form-control-sm" readonly="readonly" value="{{ prettify $entrant.Model true }}">
+                                {{ end }}
+
+                                <select class="form-control form-control-sm entryListCar" name="EntryList.Car" {{ if $IsChampionshipEvent }}style="display: none;"{{ end }}>
+                                    {{ with $entrant.Model }}<option value="{{ . }}">{{ prettify . true }}</option>{{ end }}
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="form-group row col-md-6">
+                            <label for="Skin" class="col-sm-4 col-form-label col-form-label-sm">Skin</label>
+
+                            <div class="col-sm-8">
+                                <select class="form-control form-control-sm entryListSkin" name="EntryList.Skin">
+                                    {{ with $entrant.Skin }}<option value="{{ . }}">{{ prettify . true }}</option>{{ end }}
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row col-md-6">
+                            <label for="Ballast" class="col-sm-4 col-form-label col-form-label-sm">Ballast</label>
+
+                            <div class="col-sm-8">
+                                <input class="form-control form-control-sm" type="number" min="0" name="EntryList.Ballast" value="{{ with $entrant.Ballast }}{{ . }}{{ else }}0{{ end }}">
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="row">
+
+                        <!--
+                        Despite having the option for SpectatorMode, the server does not support it, and panics if set to 1
+                        <div class="form-group col-md-4 row">
+                            <label for="SpectatorMode" class="col-sm-4 col-form-label col-form-label-sm">Spectator Mode</label>
+
+                            <div class="col-sm-8">
+                                <input class="form-control" type="checkbox" name="EntryList.Spectator" {{ with $entrant.SpectatorMode }}{{ if eq . 1 }}checked="checked"{{ end }}{{ end }}>
+
+                            </div>
+                        </div>
+
+                        -->
+
+                        <div class="form-group col-md-6 row">
+                            <label for="Restrictor" class="col-sm-4 col-form-label col-form-label-sm">Restrictor</label>
+
+                            <div class="col-sm-8">
+                                <input class="form-control form-control-sm" type="number" min="0" max="100" name="EntryList.Restrictor" value="{{ with $entrant.Restrictor }}{{ . }}{{ else }}0{{ end }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6 row">
+                            <label for="FixedSetup" class="col-sm-4 col-form-label col-form-label-sm">Fixed Setup</label>
+
+                            <div class="col-sm-8">
+                                <select class="form-control form-control-sm fixedSetup" name="EntryList.FixedSetup">
+                                    <option value="">No Fixed Setup</option>
+                                    {{ with $entrant.FixedSetup }}
+                                        <option value="{{ . }}" selected="selected">{{ . }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4">
+                    <img src="{{ with $entrant.Skin }}{{ carSkinURL $entrant.Model $entrant.Skin }}{{ else }}/static/img/no-preview-car.png{{ end }}"
+                         alt="Car Skin"
+                         class="entryListCarPreview img-fluid"
+                    >
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+{{ end }}

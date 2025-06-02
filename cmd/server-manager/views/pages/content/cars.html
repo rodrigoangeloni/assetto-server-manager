@@ -1,0 +1,142 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.carListTemplateVars */}}
+
+{{ define "title" }}Cars{{ end }}
+
+{{ define "content" }}
+    <h1 class="text-center">Cars</h1>
+
+    {{ if WriteAccess }}
+        <div class="card mb-3">
+            <div class="card-header"><strong>Upload a New Car</strong></div>
+            <div class="card-body">
+                <p class="card-text">You can upload multiple cars at once by placing them in a folder named "cars" and uploading
+                    the whole folder. The upload process will only take the files that the server requires, and so should
+                    not take too long. If you have issues uploading large numbers of cars at once please try uploading
+                    them in batches instead.</p>
+
+                <p class="card-text">First choose the correct car folder (or containing folder) using the Choose a Folder
+                    button below then use the Upload Cars button to upload your cars if the preview information appears
+                    correctly.</p>
+
+                <p class="card-text mb-0">The drag and drop input accepts a single car folder, multiple car folders
+                    or a cars folder containing multiple cars!</p>
+
+                <div class="mt-3"><input type="text" class="form-control form-control-sm" id="tags" name="tags"
+                                         placeholder="Add tags to all uploaded cars (e.g. GT3, Enduro)"></div>
+
+                <form class="d-inline">
+                    <div class="mt-3 mb-3">
+                        <div class="btn-file btn btn-secondary d-inline-block align-top">
+                            Choose a Folder
+                            <input id="input-folder-car" name="input-folder-car[]" type="file"
+                                   multiple webkitdirectory value="Choose Folder"/>
+                        </div>
+
+                        <div id="drop-zone" class="car-drop ml-2 mr-2 drop-zone d-inline-block">Or Drag & Drop Folder(s) Here</div>
+
+                        <div class="float-right">
+                            <label for="only-ks" class="mr-2">Only Upload Official KS Content</label>
+                            <input type="checkbox" name="only-ks" id="only-ks">
+                        </div>
+
+                        <div id="upload-button"></div>
+                    </div>
+
+                    <div class="progress" style="display: none;">
+                        <div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="car-fail"></div>
+        <div id="car-info-panel"></div>
+    {{ end }}
+
+    <form method="get" action="/cars" class="row mt-4 mb-2">
+        <div class="col-8 col-md-10">
+            <input name="q" placeholder="Search for cars" class="form-control" value="{{ $.Query }}" autocomplete="off">
+        </div>
+
+        <div class="col-4 col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    {{ with .Results }}
+        {{- /*gotype: github.com/blevesearch/bleve.SearchResult */ -}}
+
+        <div id="search-info" class="text-black-50 mb-2">
+            <div class="float-left">
+                {{ $pageStart := mul $.CurrentPage $.PageSize }}
+                <small>Showing results {{ $pageStart }}-{{ add $pageStart (len .Hits) }} of {{ .Total }}</small>
+            </div>
+
+            <div class="float-right">
+                <small>Search completed in {{ .Took }} | <a href="#" data-toggle="collapse" data-target="#searchHelp" aria-expanded="false" aria-controls="searchHelp">Search Help</a></small>
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="collapse" id="searchHelp">
+            <div class="card card-body">
+                {{ template "search-help" }}
+            </div>
+        </div>
+
+        {{ range $index, $car := $.Cars }}
+
+            <div class="car-wrapper">
+                <div class="card mt-2 mb-2 pt-0 pb-0 card-car">
+                    <div class="card-body row">
+                        {{ with $car.Skins }}
+                            <div class="col-12 col-sm-4 col-md-2">
+                                <img class="img img-fluid car-image" src="{{ carSkinURL $car.Name (index $car.Skins 0) }}" alt="">
+                            </div>
+                        {{ end }}
+
+                        <div class="d-block d-sm-none pt-2">&nbsp;</div>
+
+                        <div class="col-12 col-sm-8 col-md-10">
+                            <h3 class="mb-0">{{ $car.Details.Name }}</h3>
+
+                            <div class="mb-2">
+                                {{ if $car.IsPaidDLC }}<span class="badge bg-dlc">DLC</span>{{ end }}
+                                {{ if $car.IsMod }}<span class="badge bg-mod">Mod</span>{{ end }}
+                                {{ if not (or $car.IsPaidDLC $car.IsMod) }}<span class="badge bg-default-content">Default</span>{{ end }}
+                            </div>
+
+                            {{ if DeleteAccess }}
+                                <a class="delete-car" href="/car/{{ $car.Name }}/delete"><i class="fa fa-trash"></i></a>
+                            {{ end }}
+
+                            {{ range $index, $tag := $car.Details.Tags }}
+                                <span class="badge badge-secondary">
+                                <a class="text-black-50"
+                                   href="/cars?q=%2Btags:%22{{ urlquery $tag }}%22"
+                                >{{ $tag }}</a>
+                            </span>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/car/{{ $car.Name }}" class="car-link">
+                    <!-- overlaid atop the above div -->
+                </a>
+            </div>
+
+
+        {{ else }}
+            <p>Your search returned no results. Please try a different query.</p>
+        {{ end }}
+
+
+        {{ if gt (len .Hits) 0 }}
+            {{ template "pagination" dict "CurrentPage" $.CurrentPage "NumPages" $.NumPages "Request" $.Request }}
+        {{ end }}
+    {{ end }}
+
+    <div class="clearfix"></div>
+{{ end }}

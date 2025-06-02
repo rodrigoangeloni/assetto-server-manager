@@ -1,0 +1,95 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.trackListTemplateVars */}}
+
+{{ define "title" }}Tracks{{ end }}
+
+{{ define "content" }}
+    <h1 class="text-center">Tracks</h1>
+
+    {{ if WriteAccess }}
+        <div class="card mb-3">
+            <div class="card-header"><strong>Upload a New Track</strong></div>
+            <div class="card-body">
+                <p class="card-text">You can upload multiple tracks at once by placing them in a folder named "tracks" and uploading
+                    the whole folder. The upload process will only take the files that the server requires, and so should
+                    not take too long. If you have issues uploading large numbers of tracks at once please try uploading
+                    them in batches instead.</p>
+
+                <p class="card-text">First choose the correct track folder (or containing folder) using the Choose a Folder
+                    button below then use the Upload Tracks button to upload your tracks if the preview information appears
+                    correctly.</p>
+
+                <p class="card-text mb-0">The drag and drop input accepts a single track folder, multiple track folders
+                or a tracks folder containing multiple tracks!</p>
+
+                <form class="d-inline">
+                    <div class="mt-3 mb-3">
+                        <div class="btn-file btn btn-secondary d-inline-block align-top">
+                            Choose a Folder
+                            <input id="input-folder-track" name="input-folder-track[]" type="file"
+                                    webkitdirectory multiple value="Choose Folder"/>
+                        </div>
+
+                        <div id="drop-zone" class="track-drop ml-2 mr-2 drop-zone d-inline-block">Or Drag & Drop Folder(s) Here</div>
+
+                        <div class="float-right">
+                            <label for="only-ks" class="mr-2">Only Upload Official KS Content</label>
+                            <input type="checkbox" name="only-ks" id="only-ks">
+                        </div>
+
+                        <div id="upload-button"></div>
+                    </div>
+
+                    <div class="progress" style="display: none;">
+                        <div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="track-fail"></div>
+        <div id="track-info-panel"></div>
+    {{ end }}
+
+    {{ $writeAccess := WriteAccess }}
+
+    {{ range $i, $track := $.Tracks }}
+
+        <div class="car-wrapper">
+            <div class="card mt-2 mb-2 pt-0 pb-0 card-car">
+                <div class="card-body row">
+                    <div class="col-12 col-sm-4 col-md-2">
+                        <img class="img img-fluid car-image" src="{{ $track.GetImagePath }}" alt="{{ $track.Name }}">
+                    </div>
+
+                    <div class="d-block d-sm-none pt-2">&nbsp;</div>
+
+                    <div class="col-12 col-sm-8 col-md-10">
+                        <h3 class="mb-0">{{ $track.PrettyName }}</h3>
+
+                        <div class="mb-2">
+                            {{ if $track.IsPaidDLC }}<span class="badge bg-dlc">DLC</span>{{ end }}
+                            {{ if $track.IsMod }}<span class="badge bg-mod">Mod</span>{{ end }}
+                            {{ if not (or $track.IsPaidDLC $track.IsMod) }}<span class="badge bg-default-content">Default</span>{{ end }}
+                        </div>
+
+                        {{ with $track.Layouts }}
+                            <small>{{ $track.LayoutsCSV }}</small>
+                        {{ end }}
+
+                        {{ if DeleteAccess }}
+                            <a class="delete-car" href="/track/{{ $track.Name }}/delete"><i class="fa fa-trash"></i></a>
+                        {{ end }}
+
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+            <a href="/track/{{ $track.Name }}" class="car-link">
+                <!-- overlaid atop the above div -->
+            </a>
+        </div>
+    {{ end }}
+
+    <div class="clearfix"></div>
+{{ end }}

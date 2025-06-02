@@ -1,0 +1,543 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.ChampionshipTemplateVars */}}
+
+{{ define "title" }}
+    {{ if .IsEditing }}
+        Edit the {{ .Championship.Name }} Championship
+    {{ else }}
+        Create a new Championship
+    {{ end }}
+{{ end }}
+
+{{ define "content" }}
+
+    {{ $f := .Championship }}
+    {{ $ACSREnabled := .ACSREnabled }}
+
+    <h1 class="text-center">
+        {{ if .IsEditing }}
+            Edit the {{ .Championship.Name }} Championship
+        {{ else }}
+            Create a new Championship
+        {{ end }}
+    </h1>
+
+    <form action="/championships/new/submit" method="post" id="championship-form" data-safe-submit>
+
+        <div class="card mt-3 border-secondary">
+            <div class="card-header">
+                <strong>Championship</strong>
+
+                {{ if .IsEditing }}
+                    <button type="submit" class="btn btn-success float-right">Save Championship</button>
+                {{ end }}
+            </div>
+
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="ChampionshipName" class="col-sm-3 col-form-label">Championship Name</label>
+
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="ChampionshipName" name="ChampionshipName" required
+                               placeholder="My awesome championship" {{ with $f.Name }} value="{{.}}" {{ end }}>
+                    </div>
+                </div>
+
+                {{ if gt $.MaxClientsOverride 0 }}
+                    <div class="form-group row">
+                        <label for="ChampionshipName" class="col-sm-3 col-form-label">Maximum Number of Entrants</label>
+
+                        <div class="col-sm-9">
+                            <input
+                                    type="hidden"
+                                    id="MaxClients"
+                                    name="MaxClients"
+                                    value="{{ $.MaxClientsOverride }}"
+                            >
+
+                            <p class="col-form-label">Your server is restricted to a maximum of <strong>{{ $.MaxClientsOverride }}</strong> championship entrants.</p>
+
+
+                        </div>
+                    </div>
+                {{ else }}
+                    <input
+                            type="hidden"
+                            id="MaxClients"
+                            name="MaxClients"
+                            value="1000"
+                    >
+                {{ end }}
+
+                {{ if $ACSREnabled }}
+                    <div class="form-group row">
+                        <label for="ACSR" class="col-sm-3 col-form-label">Export to <a href="https://acsr.assettocorsaservers.com">Assetto Corsa Skill Ratings</a></label>
+
+                        <div class="col-sm-9">
+                            <input type="checkbox"
+                                   id="ACSR"
+                                   name="ACSR"
+                                {{ if not $.RaceTemplateVars.BaseTemplateVars.IsPremium }}
+                                    disabled="disabled"
+                                {{ end }}
+                                {{ if $f.ACSR }}
+                                    checked="checked"
+                                {{ end }}
+                            >
+
+                            <br><br>
+
+                            {{ if not $.RaceTemplateVars.BaseTemplateVars.IsPremium }}
+                                <small class="text-warning">
+                                    Exporting to <a href="https://acsr.assettocorsaservers.com">ACSR</a> is a premium feature! You can access premium features by
+                                    <a href="https://github.com/rodrigoangeloni/assetto-server-manager">supporting the project</a> or
+                                    <a href="https://www.paypal.com/biz/fund?id=9LE45G9P3KPQW">going premium</a> with a minimum $10 donation,
+                                    thanks very much!
+                                </small>
+
+                                <br>
+                                <br>
+                            {{ end }}
+
+                            <small>
+                                If enabled then entrants in this championship will be (anonymously) tracked by our skill and safety
+                                rating system! This championship will also be made publicly available for people to sign up from
+                                ACSR. For more information about ACSR and how it works, visit <a href="https://acsr.assettocorsaservers.com">Assetto Corsa Skill Ratings</a>.
+                            </small>
+
+                            <br>
+
+                            <small>
+                                <strong>Forces Sign Up Form on and Password off</strong>.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div id="acsr-options" {{ if not $f.ACSR }}class="d-none"{{ end }}>
+                        <div class="form-group row">
+                            <label for="EnableACSRSkillGate" class="col-sm-3 col-form-label">Enable Skill Gate</label>
+
+                            <div class="col-sm-9">
+                                <input type="checkbox"
+                                       id="EnableACSRSkillGate"
+                                       name="EnableACSRSkillGate"
+                                        {{ if $f.EnableACSRSkillGate }}
+                                            checked="checked"
+                                        {{ end }}
+                                >
+
+                                <br>
+
+                                <small>
+                                    If enabled then the skill gate will be activated.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="SkillGate" class="col-sm-3 col-form-label">Skill Gate</label>
+
+                            <div class="col-sm-9">
+                                <select id="SkillGate" name="SkillGate" class="form-control">
+                                    <option value="A" {{ if eq $f.ACSRSkillGate "A" }}selected{{ end }}>A</option>
+                                    <option value="B" {{ if eq $f.ACSRSkillGate "B" }}selected{{ end }}>B</option>
+                                    <option value="C" {{ if eq $f.ACSRSkillGate "C" }}selected{{ end }}>C</option>
+                                    <option value="D" {{ if eq $f.ACSRSkillGate "D" }}selected{{ end }}>D</option>
+                                    <option value="E" {{ if or (eq $f.ACSRSkillGate "E") (eq $f.ACSRSkillGate "") }}selected{{ end }}>E</option>
+                                </select>
+
+                                <small>
+                                    Only allows driver with the selected skill rating and up from joining the Championship. You
+                                    can see a graphical representation of the current skill spread of drivers below.
+                                </small>
+
+                                {{ with $.ACSRRanges }}
+                                    <div id="acsr-skill-range-container" class="mt-2">
+                                        {{ range $index, $ratingRange := $.ACSRRanges.Ranges }}
+                                            {{ if eq $ratingRange.RatingType "skill" }}
+                                                <div class="acsr-range d-inline-block">
+                                                    <div class="acsr-graph-wrapper">
+                                                        <div class="acsr-graph" style="height: {{ percentage $ratingRange.Count $.ACSRRanges.HighestSkillCount }}%"></div>
+                                                    </div>
+
+                                                    <div class="acsr-label">
+                                                        {{ $ratingRange.Name }}
+                                                    </div>
+                                                </div>
+                                            {{ end }}
+                                        {{ end }}
+                                    </div>
+                                {{ end }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="EnableACSRSafetyGate" class="col-sm-3 col-form-label">Enable Safety Gate</label>
+
+                            <div class="col-sm-9">
+                                <input type="checkbox"
+                                       id="EnableACSRSafetyGate"
+                                       name="EnableACSRSafetyGate"
+                                        {{ if $f.EnableACSRSafetyGate }}
+                                            checked="checked"
+                                        {{ end }}
+                                >
+
+                                <br>
+
+                                <small>
+                                    If enabled then the safety gate will be activated.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="SafetyGate" class="col-sm-3 col-form-label">Safety Gate</label>
+
+                            <div class="col-sm-9">
+                                <input type="number" id="SafetyGate" name="SafetyGate" class="form-control" {{ with $f.ACSRSafetyGate }} value="{{.}}" {{ end }}>
+
+                                <small>
+                                    Only allows driver with the inputted safety rating and up from joining the Championship. You
+                                    can see a graphical representation of the current safety spread of drivers below.
+                                </small>
+
+                                {{ with $.ACSRRanges }}
+                                    <div id="acsr-safety-range-container" class="mt-2">
+                                        {{ range $index, $ratingRange := $.ACSRRanges.Ranges }}
+                                            {{ if eq $ratingRange.RatingType "safety" }}
+                                                <div class="acsr-safety-range d-inline-block">
+                                                    <div class="acsr-graph-wrapper">
+                                                        <div class="acsr-graph" style="height: {{ percentage $ratingRange.Count $.ACSRRanges.HighestSafetyCount }}%"></div>
+                                                    </div>
+
+                                                    <div class="acsr-label">
+                                                        {{ $ratingRange.Name }}
+                                                    </div>
+                                                </div>
+                                            {{ end }}
+                                        {{ end }}
+                                    </div>
+                                {{ end }}
+                            </div>
+                        </div>
+                    </div>
+                {{ end }}
+
+                <div class="form-group row">
+                    <label for="ChampionshipOpenEntrants" class="col-sm-3 col-form-label">Open Championship</label>
+
+                    <div class="col-sm-9">
+                        <input type="checkbox" id="ChampionshipOpenEntrants" name="ChampionshipOpenEntrants"
+                               {{ if $f.OpenEntrants }} checked="checked" {{ end }}><br><br>
+
+                        <small>
+                            An Open Championship allows anyone to join a Championship Event provided that the Championship
+                            still has empty entrant slots. As new Entrants join, the Championship Entrant slots will be filled.
+
+                            It is possible to edit the slots (e.g. to assign teams) by using the Edit Championship functionality.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group row visible-open-championship">
+                    <label for="ChampionshipPersistOpenEntrants" class="col-sm-3 col-form-label">Persist Open Championship Entrants</label>
+
+                    <div class="col-sm-9">
+                        <input type="checkbox" id="ChampionshipPersistOpenEntrants" name="ChampionshipPersistOpenEntrants"
+                               {{ if $f.PersistOpenEntrants }} checked="checked" {{ end }}><br><br>
+
+                        <small>
+                            With this option enabled, when a Driver joins an Open Championship Event their details will
+                            be added to the Entry List below. This option is enabled by default. With this option disabled,
+                            Entrants will not be added to the Entry List for a Championship and Events will start with an
+                            'empty' Entry List each time (i.e. no drivers are added to the car choices you configure).
+                            <strong>Their results will still persist to the Championship</strong>.
+                            Turn this off if you are running a Championship with a lot of changing Entrants (e.g. quick fire events all in one go).
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="OverridePassword" class="col-sm-3 col-form-label">Override Server Password</label>
+
+                    <div class="col-sm-9">
+                        <input type="checkbox" id="OverridePassword" name="OverridePassword"
+                                {{ if $f.OverridePassword }} checked="checked" {{ end }}><br><br>
+
+                        <small>
+                            If enabled then the server password will be ignored for all events in this championship.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group row" id="ReplacementPasswordWrapper" {{ if not $f.OverridePassword }} style="display: none;" {{ end }}>
+                    <label for="ReplacementPassword" class="col-sm-3 col-form-label">Replacement Password</label>
+
+                    <div class="col-sm-9">
+
+                        <input
+                                class="form-control"
+                                type="password"
+                                autocomplete="new-password"
+                                id="ReplacementPassword"
+                                name="ReplacementPassword"
+                                value="{{ $f.ReplacementPassword }}"
+                        >
+
+                        <small>If left empty then the server will have no password.</small>
+                    </div>
+                </div>
+
+                {{ if .IsEditing }}{{ with .Championship.Info }}<div class="d-none" id="ChampionshipInfoHolder">{{ . }}</div>{{ end }}{{ end }}
+
+                <div class="form-group row">
+                    <label for="summernote" class="col-sm-3 col-form-label">Important Information</label>
+
+                    <div class="col-sm-9" id="championship-info">
+                        <textarea id="summernote" name="ChampionshipInfo"></textarea>
+                        <div class="clearfix"></div>
+
+                        <small>Important information is shown at the top of a Championship page and on Sign Up pages (if enabled).</small>
+                    </div>
+
+                </div>
+
+                {{ if $.RaceTemplateVars.BaseTemplateVars.IsPremium }}
+                    <div class="form-group row">
+                        <label for="ChampionshipOGImage" class="col-sm-3 col-form-label">Championship Open Graph Image</label>
+
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="ChampionshipOGImage" name="ChampionshipOGImage"
+                                   placeholder="Any image URL" {{ with $f.OGImage }} value="{{.}}" {{ end }}>
+
+                            <small>The URL of an image to be shown in any link to this championship.</small>
+                        </div>
+                    </div>
+                {{ end }}
+
+                <div class="form-group row">
+                    <label for="ChampionshipDefaultTab" class="col-sm-3 col-form-label">Default Tab</label>
+
+                    <div class="col-sm-9">
+                        <select name="ChampionshipDefaultTab" id="ChampionshipDefaultTab" class="form-control">
+                            {{ range $index, $tab := $.AvailableChampionshipTabs }}
+                                <option value="{{ $tab }}" {{ if eq $tab $f.DefaultTab }}selected="selected"{{ end }}>{{ $tab }}</option>
+                            {{ end }}
+                        </select>
+
+                        <small>The default tab shown when the Championship information page is loaded.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ if $.IsPremium }}
+            <div class="card mt-3 border-secondary race-setup hidden-open-championship">
+                <div class="card-header">
+                    <strong>Spectator Car</strong>
+                </div>
+
+                <div class="d-none">
+                    {{ template "cars" dict "CarOpts" $.CarOpts "Current" nil "SelectAllCars" true }}
+
+                    <input type="hidden" name="NumAvailableSpectatorCars" value="{{ len $.CarOpts }}">
+                </div>
+
+                <div class="card-body" id="entrants">
+                    <p>
+                        You can configure a Spectator Car for this Championship. Spectator Cars are automatically
+                        added to the back of the Entry List for each Championship Event, and ignored when calculating Championship Points.
+                    </p>
+
+                    {{ if $.IsHosted }}
+                        <p class="text-danger">Please note that the Spectator Car uses 1 slot on your hosted server. Events may fail to start if you have too many slots in use!</p>
+                    {{ end }}
+
+                    <div class="form-group row">
+                        <label for="Championship.SpectatorCar.Enabled" class="col-sm-3 col-form-label">Enabled</label>
+
+                        <div class="col-sm-9">
+                            <input type="checkbox"
+                                   class="spectator-toggle"
+                                   id="ChampionshipSpectatorCarEnabled"
+                                   name="Championship.SpectatorCar.Enabled"
+                                    {{ if $.Championship.HasSpectatorCar }}
+                                        checked="checked"
+                                    {{ end }}
+                            ><br><br>
+                        </div>
+                    </div>
+
+
+                    <div class="visible-spectator-enabled" {{ if not $.Championship.HasSpectatorCar }} style="display: none" {{ end }}>
+                        <div class="entrant">
+                            {{ template "entrant" dict "Entrant" $.Championship.SpectatorCar "IsChampionshipEvent" false "IsEditing" $.IsEditing "IsChampionship" true "IsSpectatorCar" true }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{ end }}
+
+        <div class="card mt-3 border-secondary">
+            <div class="card-header">
+                <strong>Sign Up Form</strong>
+            </div>
+
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="Championship.SignUpForm.Enabled" class="col-sm-3 col-form-label">Enabled</label>
+
+                    <div class="col-sm-9">
+                        <input type="checkbox" id="ChampionshipSignUpFormEnabled" name="Championship.SignUpForm.Enabled"
+                                {{ if $f.SignUpForm.Enabled }} checked="checked" {{ end }}><br><br>
+
+                        <small>
+                            Allow anyone to access a Sign Up form where they can register to be added into the EntryList of a Championship.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="show-signup-form-enabled" {{ if not $f.SignUpForm.Enabled}} style="display: none" {{ end }}>
+                    <div class="form-group row">
+                        <label for="Championship.SignUpForm.RequiresApproval" class="col-sm-3 col-form-label">Require all applications to be approved by an admin/write user?</label>
+
+                        <div class="col-sm-9">
+                            <input type="checkbox" id="Championship.SignUpForm.RequiresApproval" name="Championship.SignUpForm.RequiresApproval"
+                                    {{ if $f.SignUpForm.RequiresApproval }} checked="checked" {{ end }}><br><br>
+
+                            <small>
+                                All applications will be visible in a page where you can Accept or Reject them.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="Championship.SignUpForm.AskForEmail" class="col-sm-3 col-form-label">Ask users for Email?</label>
+
+                        <div class="col-sm-9">
+                            <input type="checkbox" id="Championship.SignUpForm.AskForEmail" name="Championship.SignUpForm.AskForEmail"
+                                    {{ if $f.SignUpForm.AskForEmail }} checked="checked" {{ end }}><br><br>
+
+                            <small>
+                                Asking users for their email will allow you to contact them with event details etc.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="Championship.SignUpForm.AskForTeam" class="col-sm-3 col-form-label">Ask users for Team?</label>
+
+                        <div class="col-sm-9">
+                            <input type="checkbox" id="Championship.SignUpForm.AskForTeam" name="Championship.SignUpForm.AskForTeam"
+                                    {{ if $f.SignUpForm.AskForTeam }} checked="checked" {{ end }}><br><br>
+
+                            <small>
+                                Allow users to specify their team name.
+                            </small>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <label for="Championship.SignUpForm.HideCarChoice" class="col-sm-3 col-form-label">Let users choose Car and Skin?</label>
+
+                        <div class="col-sm-9">
+                            <input type="checkbox" id="Championship.SignUpForm.HideCarChoice" name="Championship.SignUpForm.HideCarChoice"
+                                    {{ if not $f.SignUpForm.HideCarChoice }} checked="checked" {{ end }}><br><br>
+
+                            <small>
+                                Lets users control which car and skin they want to drive.
+                            </small>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <label for="Championship.SignUpForm.ExtraFields" class="col-sm-3 col-form-label">Extra Questions</label>
+
+                        <div class="col-sm-9">
+
+                            <div id="Questions">
+                                {{ range $index, $question := $f.SignUpForm.ExtraFields }}
+                                    <div class="championship-signup-question row">
+                                        <div class="col-sm-11">
+                                            <input type="text" class="form-control championshipExtraField" name="Championship.SignUpForm.ExtraFields"
+                                                   placeholder="e.g. What is your discord username?" value="{{ $question }}">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <a href="#" class="text-danger btn-delete-question"><i class="fas fa-trash"></i></a>
+                                        </div>
+                                    </div>
+                                {{ else }}
+                                    <div class="championship-signup-question row">
+                                        <div class="col-sm-11">
+                                            <input type="text" class="form-control championshipExtraField" name="Championship.SignUpForm.ExtraFields"
+                                                   placeholder="e.g. What is your discord username?">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <a href="#" class="text-danger btn-delete-question"><i class="fas fa-trash"></i></a>
+                                        </div>
+                                    </div>
+                                {{ end }}
+                            </div>
+
+                            <div class="mt-2">
+                                <button class="btn btn-info float-right" id="AddSignUpFormQuestion">Add another question</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {{ with $.RecaptchaSiteKey }}
+                        <span class="text-success">reCAPTCHA is configured. Users will be prompted to complete a CAPTCHA before their registration request is submitted.</span>
+                    {{ else }}
+                        <span class="text-danger">reCAPTCHA is not configured. Users will NOT be prompted to complete a CAPTCHA before their registration request is submitted. You can enable reCAPTCHA in your config.yml.</span>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+
+        <div id="class-template" style="display: none;">
+            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $.DefaultClass "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride }}
+        </div>
+
+        {{ range $classIndex, $class := $f.Classes }}
+            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $class "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride }}
+        {{ else }}
+            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $.DefaultClass "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride }}
+        {{ end }}
+
+
+        <div class="mt-3">
+            <button id="addClass" class="btn btn-primary float-right">Add another class</button>
+        </div>
+        <div class="clearfix"></div>
+
+
+        <hr>
+
+        <div class="mt-5">
+            {{ if .IsEditing }}
+                <input type="hidden" name="Editing" id="Editing" value="{{ $f.ID.String }}">
+                <button type="submit" class="btn btn-success float-right">Save Championship</button>
+            {{ else }}
+                <div class="float-right">
+                    <button type="submit" name="action" value="addRaceWeekend" class="btn btn-info">Add a Race Weekend</button>
+                    <button type="submit" name="action" value="addEvent" class="btn btn-success">Add an Event</button>
+                </div>
+            {{ end }}
+        </div>
+
+        <div class="clearfix"></div>
+    </form>
+
+
+    <script type="text/javascript">
+        const availableTyres = {{ jsonEncode .Tyres }};
+        const possibleEntrants = {{ jsonEncode .PossibleEntrants }};
+        const availableCars = {{ jsonEncode .CarOpts.AsMap }};
+        const defaultPoints = {{ jsonEncode .DefaultPoints }};
+        const fixedSetups = {{ jsonEncode .FixedSetups }};
+    </script>
+
+{{ end }}

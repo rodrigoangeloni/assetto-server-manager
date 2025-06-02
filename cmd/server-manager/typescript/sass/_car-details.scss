@@ -1,0 +1,67 @@
+.car-wrapper {
+  position: relative;
+  display: block;
+
+  .car-link {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: 3;
+  }
+
+
+  &:hover {
+    cursor: pointer;
+
+    h3 {
+      color: $link-hover-color;
+    }
+  }
+}
+
+
+.card-car {
+  h3 {
+    color: $link-color;
+  }
+
+  .delete-car {
+    color: $danger;
+
+    position: absolute;
+    top: 0;
+    right: 15px;
+    z-index: 4;
+  }
+}
+
+.car-details, .track-details {
+  .car-skins, .track-layouts {
+    max-height: 518px;
+    overflow-y: auto;
+
+    &:not(#hero-skin) {
+      cursor: pointer;
+    }
+
+    .car-skin, .track-layout {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+
+      &:nth-child(1) {
+        margin-top: 0;
+      }
+    }
+  }
+
+  #input-folder-skin {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .btn:hover {
+    cursor: pointer;
+  }
+}

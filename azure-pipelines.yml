@@ -1,0 +1,116 @@
+# Go
+# Build your Go project.
+# Add steps that test, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/go
+
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: draftRelease
+  displayName: Draft Release
+  type: string
+  default: true
+  values:
+  - true
+  - false
+
+
+variables:
+  GOBIN:  '$(GOPATH)/bin' # Go binaries path
+  GOROOT: '/usr/local/go1.20' # Go installation path
+  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
+  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
+
+steps:
+- task: GoTool@0
+  inputs:
+    version: '1.20'
+    goPath: '$(GOPATH)'
+    goBin: '$(GOBIN)'
+
+- task: NodeTool@0
+  inputs:
+    versionSource: 'spec'
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    mkdir -p '$(GOBIN)'
+    mkdir -p '$(GOPATH)/pkg'
+    mkdir -p '$(modulePath)'
+    shopt -s extglob
+    shopt -s dotglob
+    mv !(gopath) '$(modulePath)'
+    echo '##vso[task.prependpath]$(GOBIN)'
+    echo '##vso[task.prependpath]$(GOROOT)/bin'
+  displayName: 'Set up the Go workspace'
+
+- script: |
+    go version
+    #go get -v -t -d ./...
+    #if [ -f Gopkg.toml ]; then
+    #    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    #    dep ensure
+    #fi
+    #go build -v .
+  workingDirectory: '$(modulePath)'
+  displayName: 'Check Go Version'
+
+- script: |
+    ls -ltr
+  workingDirectory: '$(modulePath)'
+  displayName: 'List Working Directory'
+
+- script: |
+    make clean
+  workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
+  displayName: 'Clean Up Cached Data'
+
+- script: |
+    make assets
+  workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
+  displayName: 'Build NodeJS Assets'
+
+- script: |
+    make asset-embed
+  workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
+  displayName: 'Generate Go project'
+
+- script: |
+    make test
+  workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
+  displayName: 'Test Application'
+
+- script: |
+    make deploy
+  workingDirectory: '$(modulePath)'
+  env:
+    VERSION: $(Version) 
+  displayName: 'Create Executables'
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'Release GitHub'
+    repositoryName: 'rodrigoangeloni/assetto-server-manager'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    title: 'Automated Release of $(VERSION)'
+    tag: $(Build.BuildNumber)
+    releaseNotesFilePath: '$(modulePath)/RELEASENOTES.md'
+    assets: '$(Agent.BuildDirectory)/server-manager.zip'
+    isDraft: ${{ parameters.draftRelease }}
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'

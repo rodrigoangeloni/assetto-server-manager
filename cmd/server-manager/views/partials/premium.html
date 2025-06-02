@@ -1,0 +1,41 @@
+{{ define "premium" }}
+    {{ if not $.IsPremium }}
+        <div class="card border-primary mb-4 {{ randAlphaNum 10 }}" id="{{ randAlphaNum 10 }}">
+            <div class="card-body">
+                <p>
+                    Assetto Corsa Server Manager is free, open source software. We're really proud of it and we think it adds a lot of
+                    really exciting stuff to Assetto Corsa. It's improved the way we play and enjoy the game,
+                    and we hope that it has done for you too.
+                </p>
+
+                <p>
+                    We have dedicated a lot of time towards the development of Server Manager, and it'd be great if
+                    you would consider supporting us. It helps us keep working on cool new features for Server Manager!
+                </p>
+
+                <ul>
+                    <li>
+                        <strong>Rent a Server</strong> - always-online server hosting for Assetto Corsa - with Server Manager Premium (obviously!).
+                        We handle setup and updates so you can get on and race!
+                    </li>
+
+                    <li>
+                        <strong>Go Premium</strong> - purchase Server Manager Premium. This is a one-off purchase.
+                        Server Manager Premium includes:
+                        Our new Custom Assetto Corsa Server, built from the ground up,
+                        <a href="https://acsr.assettocorsaservers.com">Assetto Corsa Skill Ratings</a>,
+                        our powerful <a href="/race-weekends">Race Weekends</a> feature, Driver Swaps, Multi-server
+                        support, Time Attack Events, Improved Live Timings, Lua Scripting Hooks and more!
+                        You will also receive premium versions of future Server Manager updates!
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer text-right">
+                <div class="float-right text-right">
+                    <a class="btn btn-success" href="https://github.com/rodrigoangeloni/assetto-server-manager">View on GitHub <i class="ml-1 fab fa-github"></i></a>
+                    <a class="btn btn-danger" href="https://github.com/rodrigoangeloni/assetto-server-manager">Support Project <i class="ml-1 fas fa-heart"></i></a>
+                </div>
+            </div>
+        </div>
+    {{ end }}
+{{ end }}

@@ -1,0 +1,54 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.realPenaltyConfigurationTemplateVars */}}
+
+{{ define "title" }}Real Penalty Options{{ end }}
+
+{{ define "content" }}
+    <h1 class="text-center">Real Penalty Options</h1>
+
+    <p>
+        <a href="https://www.racedepartment.com/downloads/real-penalty-tool.29591/">Real Penalty</a> is the popular server side app
+        designed to manage custom penalties for organised racing.<br><br>
+
+        <em>Real Penalty is not developed or maintained by {{ if $.IsHosted }}RodrigoAngeloni{{ else }}the Server Manager authors{{ end }}.
+        If you have questions related to the operation of the Real Penalty tool itself, please ask on the
+            <a href="https://www.racedepartment.com/threads/real-penalty-tool.175214/">Real Penalty support thread</a>.</em>
+    </p>
+
+    {{ if .IsRealPenaltyInstalled }}
+        <p>
+            These configuration options are applied globally - they are applied to the Real Penalty configuration files
+            whenever a race setup is started by Server Manager.
+        </p>
+
+        <form method="post" action="/realpenalty/options">
+            {{ $.Form }}
+
+            <button class="btn btn-success float-right" type="submit">Save</button>
+
+            <div class="clearfix"></div>
+
+            <hr>
+
+            <h3>Download Logs</h3>
+
+            <p>You can download all of your Real Penalty logs in zip format here.</p>
+
+            <a class="btn btn-info" href="/realpenalty/logs">Download Logs</a>
+        </form>
+    {{ else }}
+        <p>Real Penalty is not installed. Please follow the instructions below to install Real Penalty, or contact your Server Administrator:</p>
+
+        <ol>
+            <li><a href="https://www.racedepartment.com/downloads/real-penalty-tool.29591/history">Download Real Penalty {{ $.RealPenaltySupportedVersion }}</a></li>
+            <li>Extract <code>Real Penalty {{ $.RealPenaltySupportedVersion }}.zip</code></li>
+            <li>Rename the extracted folder to <code>realpenalty</code></li>
+            <li>Move that folder inside your <code>assetto</code> folder. If you are using multiserver, copy it inside each one of them. E.g. inside <code>youracserver/servers/SERVER_00/assetto/</code></li>
+            <li>Make sure that you have set UDP Plugin Address and UDP Plugin Local Port in <a href="/server-options">Server Options</a></li>
+            <li>Refresh this page!</li>
+        </ol>
+
+        <p>Note: these instructions and the integration provided are known to be compatible with <code>{{ $.RealPenaltySupportedVersion }}</code> of Real Penalty.
+        Other versions may work. If you have problems with a more recent version than this,
+        please <a href="https://github.com/JustaPenguin/assetto-server-manager/issues">File an issue</a>.</p>
+    {{ end }}
+{{ end }}

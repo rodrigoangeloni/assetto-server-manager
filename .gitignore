@@ -1,0 +1,48 @@
+.idea
+server-install
+docker-compose.yml
+cmd/championship-import
+server-manager.log
+server_manager.db
+config.yml
+assetto/
+
+# Build outputs and binaries
+build/
+cmd/server-manager/server-manager*
+server-manager-linux
+server-manager.exe
+
+# Node modules and frontend build
+cmd/server-manager/typescript/node_modules/
+cmd/server-manager/typescript/static/js/bundle.*
+cmd/server-manager/typescript/static/css/bundle.*
+
+# Generated files
+cmd/server-manager/static_embed.go
+
+# Created by https://www.gitignore.io/api/go
+# Edit at https://www.gitignore.io/?templates=go
+
+### Go ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+### Go Patch ###
+/Godeps/
+
+# End of https://www.gitignore.io/api/go
+*.syso
+*.map
+changelog_embed.go
+

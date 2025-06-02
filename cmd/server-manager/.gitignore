@@ -1,0 +1,16 @@
+assetto
+.env
+server_manager.db
+config.yml
+server-manager
+static_embed.go
+static/manager.js
+node_modules
+stracker*
+!stracker-options.html
+build/
+*.zip
+*.log
+static/js/bundle.js
+static/css
+typescript/.gulp-cache

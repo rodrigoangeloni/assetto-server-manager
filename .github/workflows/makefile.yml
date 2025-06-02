@@ -1,0 +1,50 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Go environment
+      uses: actions/setup-go@v4.1.0
+      with:
+        go-version: 1.21
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v3.8.1
+      with:
+        node-version: 12
+
+    - name: Adding Exports
+      run: |
+        export GO111MODULE=on
+
+    - name: Run Clean
+      run: make clean
+    
+    - name: Run assets
+      run: make assets
+    
+    - name: Run asset-embed
+      run: make asset-embed
+
+    - name: Run Linting
+      run:  make vet
+
+    - name: Run Test
+      run: make test
+
+    - name: Run Assets
+      run: make assets
+
+    - name: Run Deploy
+      run: make deploy

@@ -1,0 +1,273 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.liveTimingTemplateVars */}}
+
+{{ define "title" }}Live Timing{{ end }}
+
+{{ define "extracss" }}
+    <style type="text/css">
+        .dot {
+            transition: {{ $.CSSDotSmoothing }}ms linear;
+        }
+    </style>
+{{ end }}
+
+{{ define "iframe-block" }}
+    <div class="col-md-6 live-frame-wrapper mt-2 {{ with . }}{{ else }}d-none{{ end }}">
+        <div class="col-12 p-0">
+            <div class="embed-responsive embed-responsive-16by9 p-0">
+                <iframe class="embed-responsive-item p-0 live-frame" src="{{ . }}"></iframe>
+            </div>
+            {{ if WriteAccess }}
+                <div class="mt-2 {{ with . }}{{ else }}ml-0{{ end }} frame-input">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <input type="text" class="live-frame-link form-control" name="frame-link" value="{{ . }}"
+                                   placeholder="IFrame content link (track location on map, race live stream etc.)">
+                        </div>
+                        <div class="col-sm-3 pl-1">
+                            <button class="btn btn-primary text-light remove-live-frame float-right">Remove IFrame</button>
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
+        </div>
+    </div>
+{{ end }}
+
+{{ define "content" }}
+    {{ $CMJoinLink := .CMJoinLink }}
+    {{ $UseMPH := .UseMPH }}
+
+    {{ with .RaceDetails }}
+        <div class="race-control-event-info">
+            {{ range $sessionName, $session := .RaceConfig.Sessions }}
+                <span data-toggle="tooltip" title="{{ $sessionName.String }}" class="badge badge-primary">{{ trunc 1 $sessionName.String }}</span>
+            {{ end }}
+
+            <br>
+
+            <small class="mr-1" data-toggle="tooltip" title="{{ .EntryList.Entrants }}" >{{ len .EntryList }} <i class="fa fa-user"></i></small>
+
+        </div>
+
+        <div class="race-control-weather-info">
+            <img class="img img-fluid mt-1 d-lg-inline-block d-none" id="weatherImage" src="/static/img/no-preview-general.png" alt="Current Weather">
+
+            <div class="d-inline-block">
+                <div id="road-temp-wrapper" data-toggle="tooltip" data-original-title="Road Temp">
+                    <div id="road-temp-text"></div>
+                    <img src="/static/img/temp-road.png" alt="Road Temp" id="road-temp">
+                </div>
+                <div id="ambient-temp-wrapper" class="mt-1" data-toggle="tooltip" data-original-title="Ambient Temp">
+                    <div id="ambient-temp-text"></div>
+                    <img src="/static/img/temp-ambient.png" alt="Ambient Temp" id="ambient-temp">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center pl-5 pr-5" style="margin-top: -15px">
+            <a href="#" id="event-title" data-toggle="popover" data-placement="bottom"></a>
+            <div id="track-location"></div>
+
+            <span id="race-time" class="mt-2 badge badge-primary" style="font-size: 1em;">--:--:--</span>
+        </div>
+
+        <br>
+
+        <div class="race-control-buttons">
+            {{ with $CMJoinLink }}
+                <a id="cm-join-link" href="{{ . }}" class="btn btn-success btn-sm mt-1">Join</a>
+            {{ end }}
+
+            {{ if AdminAccess }}
+                <button id="admin-panel" data-toggle="popover" class="btn btn-sm btn-info mt-1" data-placement="bottom">Admin Panel</button>
+            {{ end }}
+
+            {{ if $.IsStrackerEnabled }}
+                <a href="{{ $.STrackerInterfacePublicURL }}" class="btn btn-primary btn-sm mt-1">sTracker</a>
+            {{ end }}
+
+            {{ if and $.IsKissMyRankEnabled (ne $.KissMyRankWebStatsPublicURL "") }}
+                <a href="{{ $.KissMyRankWebStatsPublicURL }}" target="_blank" class="btn btn-warning btn-sm mt-1">KissMyRank</a>
+            {{ end }}
+        </div>
+
+        <div id="popover-content-event-title" class="d-none">
+            <img class="img img-fluid mt-2"
+                 id="trackImage"
+                 src="/static/img/no-preview-general.png"
+            >
+
+            <ul class="list-unstyled mt-2">
+                <li><strong>Description:</strong> <span id="track-description"></span></li>
+                <li><strong>Length:</strong> <span id="track-length"></span></li>
+                <li><strong>Pit Boxes:</strong> <span id="track-pitboxes"></span></li>
+                <li><strong>Width:</strong> <span id="track-width"></span></li>
+                <li><strong>Run:</strong> <span id="track-run"></span></li>
+            </ul>
+        </div>
+
+        <div id="popover-content-admin-panel" class="d-none">
+            <form class="form-inline p-1" id="broadcast-chat-form" name="broadcast-chat-form" action="/broadcast-chat">
+
+                <div class="form-row">
+                    <label for="broadcast-chat">Broadcast Chat: </label>
+                </div>
+
+                <div class="form-row">
+                    <input type="text" name="broadcast-chat" id="broadcast-chat" class="broadcast-chat form-control form-control-sm" placeholder="Have a great race everybody!">
+
+                    <button class="btn btn-success btn-sm ml-1" type="submit">Send</button>
+                </div>
+
+            </form>
+
+            <form class="form p-1" id="send-chat-form" name="send-chat-form" action="/send-chat">
+                <div class="form-row" style="margin-bottom: -7px">
+                    <label for="send-chat">Send Chat to Driver: </label>
+                </div>
+
+                <div class="form-row mb-2">
+                    <select class="form-control-sm chat-user" name="chat-user" id="chat-user">
+                        <option value="default-driver-spacer">No drivers found!</option>
+                        <!-- driver kick opts appended by javascript -->
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <input type="text" name="send-chat" id="send-chat" class="send-chat form-control form-control-sm admin-command-input" placeholder="Watch those track limits!">
+
+                    <button class="btn btn-success btn-sm ml-1" type="submit">Send</button>
+                </div>
+            </form>
+
+            <form class="form-inline p-1" id="admin-command-form" name="admin-command-form" action="/admin-command">
+
+                <div class="form-row">
+                    <label for="admin-command">Admin Command: </label>
+                </div>
+
+                <div class="form-row">
+                    <input type="text" name="admin-command" id="admin-command" class="admin-command form-control form-control-sm" placeholder="/ballast 2 100">
+
+                    <button class="btn btn-success btn-sm ml-1" type="submit">Send</button>
+                </div>
+
+            </form>
+
+            <form class="form p-1" id="kick-user-form" name="kick-user-form" action="/kick-user">
+                <div class="form-row" style="margin-bottom: -7px">
+                    <label for="kick-user">Kick Driver: </label>
+                </div>
+
+                <div class="form-row">
+                    <select class="form-control-sm kick-user" name="kick-user" id="kick-user">
+                        <option value="default-driver-spacer">No drivers found!</option>
+                        <!-- driver kick opts appended by javascript -->
+                    </select>
+
+                    <button class="btn btn-danger btn-sm ml-1" type="submit">Kick</button>
+                </div>
+            </form>
+
+            <div style="height: 43px">
+                <a id="countdown" href="/countdown" class="btn btn-info btn-sm mt-3">Broadcast Countdown</a>
+            </div>
+
+            <a id="next-session" href="/next-session" class="btn btn-success btn-sm mt-3">Next Session</a>
+            <a id="restart-session" href="/restart-session" class="btn btn-warning btn-sm mt-3">Restart Session</a>
+
+
+
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-lg-7 col-md-12 mt-5">
+                <div class="table-responsive table-sm">
+                    <table id="live-table" class="table table-bordered table-striped">
+                        <tr>
+                            <th class="p-1 text-center">&num;</th>
+                            <th>Driver</th>
+                            <th>Car</th>
+                            <th>Current Lap</th>
+                            <th>Last Lap</th>
+                            <th>Best Lap</th>
+                            <th>Gap</th>
+                            <th>&num; Laps</th>
+                            <th>Top Speed</th>
+                            <th class="live-events">Events</th>
+                        </tr>
+
+                        <!-- trs for drivers are appended by javascript -->
+                    </table>
+                </div>
+
+                <div id="stored-times" style="display: none">
+                    <h4>Stored Times</h4>
+                    <div class="table-responsive table-sm">
+                        <table id="live-table-disconnected" class="table table-bordered table-striped">
+                            <tr>
+                                <th>Driver</th>
+                                <th>Car</th>
+                                <th>Best Lap</th>
+                                <th>&num; Laps</th>
+                                <th>Top Speed</th>
+                            </tr>
+
+                            <!-- trs for drivers are appended by javascript -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 col-md-12 mt-5">
+                {{ if Config.LiveMap.IsEnabled }}
+                    <div class="map-container">
+                        <div id="map">
+                            <img src="" class="img img-fluid img-bordered" id="trackMapImage">
+                        </div>
+                    </div>
+
+                    <div class="card card-body mt-2" id="chat-container">
+                        <div class="card-text chat-message-template"><span id="chat-message-sender"></span>Game chat!</div>
+                    </div>
+
+                    {{ if AdminAccess }}
+
+                        <form class="form mt-2" id="broadcast-chat-form" name="broadcast-chat-form" action="/broadcast-chat" autocomplete="off">
+                            <div class="form-group">
+                                <input type="text" name="broadcast-chat" id="broadcast-chat" class="broadcast-chat form-control form-control-sm" placeholder="Broadcast chat">
+                            </div>
+                        </form>
+
+                    {{ end }}
+                {{ end }}
+            </div>
+        </div>
+
+        <form action="/live-timing/save-frames" method="post" class="live-frames row mt-2">
+            <!-- Hidden, used for cloning -->
+            {{ template "iframe-block" }}
+
+            {{ with $.FrameLinks }}
+                {{ range $index, $link := $.FrameLinks }}
+                    {{ template "iframe-block" $link }}
+                {{ end }}
+            {{ end }}
+
+            <div class="clearfix"></div>
+
+            {{ if WriteAccess }}
+                <div class="col-12 mt-4">
+                    <a class="btn btn-primary text-light" id="add-live-frame">Add IFrame</a>
+                    <button type="submit" class="btn btn-success text-light">Save IFrames</button>
+                </div>
+            {{ end }}
+        </form>
+
+        <script type="text/javascript">
+            const useMPH = {{ $UseMPH }};
+        </script>
+    {{ end }}
+{{ end }}

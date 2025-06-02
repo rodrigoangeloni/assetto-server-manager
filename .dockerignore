@@ -1,0 +1,4 @@
+cmd/server-manager/assetto/
+server-install
+*.log
+node_modules
