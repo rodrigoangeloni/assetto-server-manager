@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp/replay"
-	"github.com/etcd-io/bbolt"
 	"github.com/google/uuid"
+	"go.etcd.io/bbolt"
 )
 
 var filename string

@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/getsentry/raven-go"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"

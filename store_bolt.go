@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/etcd-io/bbolt"
+	"go.etcd.io/bbolt"
 )
 
 type BoltStore struct {

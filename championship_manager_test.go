@@ -11,7 +11,7 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp/replay"
 
-	"github.com/etcd-io/bbolt"
+	"go.etcd.io/bbolt"
 )
 
 var TestEntryList = EntryList{

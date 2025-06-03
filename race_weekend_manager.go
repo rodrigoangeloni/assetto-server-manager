@@ -14,7 +14,7 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
 	"github.com/cj123/ini"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/mattn/go-zglob"
 	"github.com/sirupsen/logrus"

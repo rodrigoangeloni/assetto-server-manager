@@ -152,7 +152,7 @@ if (-not (Test-Path "config.yml")) {
 # Crear estructura de directorios de Assetto Corsa
 Write-Host "📂 Creando estructura de directorios..." -ForegroundColor Cyan
 try {
-    mkdir -Force "assetto\content\tracks", "assetto\content\cars", "assetto\system" | Out-Null
+    New-Item -ItemType Directory -Force -Path "assetto\content\tracks", "assetto\content\cars", "assetto\system" | Out-Null
     Write-Host "✅ Estructura de directorios creada" -ForegroundColor Green
 } catch {
     Write-Host "⚠️ Algunos directorios ya existen" -ForegroundColor Yellow
@@ -173,7 +173,7 @@ Push-Location "cmd\server-manager"
 
 try {
     # Crear directorios de build
-    mkdir -Force "build\linux", "build\windows" | Out-Null
+    New-Item -ItemType Directory -Force -Path "build\linux", "build\windows" | Out-Null
     
     # Copiar archivos para release de Linux
     Copy-Item "config.example.yml" "build\linux\config.yml"

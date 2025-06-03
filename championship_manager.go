@@ -19,7 +19,7 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
 	"github.com/cj123/caldav-go/icalendar"
 	"github.com/cj123/caldav-go/icalendar/components"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/haisum/recaptcha"
 	"github.com/sirupsen/logrus"

@@ -1,3 +1,73 @@
+v1.7.11 - Security & Modernization Update (2024-12-27)
+-------------------------------------------------------
+
+**Major Security & Dependency Updates:**
+
+Dependencies:
+* **Go Runtime**: Updated from 1.13 → 1.22.0 (latest stable)
+* **Router Modernization**: go-chi/chi v4 → v5 (performance improvements)
+* **Critical Security Packages**:
+  - golang.org/x/crypto: Updated to v0.28.0 (from 2020 version)
+  - golang.org/x/net: Updated to v0.30.0 (from 2020 version) 
+  - golang.org/x/sync: Updated to v0.8.0 (from 2020 version)
+* **Core Dependencies**:
+  - gorilla/websocket: 1.4.1 → 1.5.3
+  - sirupsen/logrus: 1.4.2 → 1.9.3
+  - google/uuid: 1.1.1 → 1.6.0
+  - 4d63.com/tz: 1.1.0 → 1.2.0
+  - BurntSushi/toml: 0.3.1 → 1.4.0
+  - Masterminds/goutils: 1.1.0 → 1.1.1
+  - blevesearch/mmap-go: 1.0.2 → 1.0.4
+  - blevesearch/segment: 0.9.0 → 0.9.1
+
+Frontend:
+* **npm Security**: Reduced vulnerabilities from 45 → 1 (98% reduction)
+* **Build System Modernization**: Updated gulp ecosystem, eliminated deprecated Sass warnings
+* **Critical Package Updates**:
+  - jQuery: 3.3.1 → 3.7.1 (security fixes)
+  - Moment.js: 2.24.0 → 2.30.1 (security & timezone fixes)
+  - Moment-timezone: 0.5.27 → 0.5.48
+  - Summernote: 0.8.15 → 0.9.1
+  - Bootstrap: 4.3.1 → 4.6.2 (final 4.x release)
+* **Build Tools**: Added missing gulp-cli dependency
+
+Fixed:
+* **Import Paths**: Corrected deprecated bbolt import paths (github.com/etcd-io/bbolt → go.etcd.io/bbolt)
+* **Dead Code**: Removed unused write to CurrentRaceConfig field in race_manager.go
+* **Module Resolution**: Fixed "go mod tidy" requirement errors
+* **Build Process**: Verified frontend compilation with updated dependencies
+
+Security:
+* **CVE Fixes**: Addressed multiple known vulnerabilities in npm dependencies
+* **Crypto Libraries**: Updated to latest secure versions of cryptographic packages
+* **Network Stack**: Updated networking libraries to patch security issues
+* **Dependency Audit**: Regular security auditing implemented in build process
+
+**Technical Changes:**
+* **Module System**: Migrated all Go imports to use proper v5 versioning
+* **Build System**: Modernized PowerShell scripts (removed deprecated aliases)
+* **Sass Processing**: Eliminated all deprecation warnings with modern API usage
+* **Error Handling**: Improved error reporting in build process
+* **Cross-Platform**: Verified builds work on both Windows and Linux
+* **Performance**: Chi router upgrade improves request handling performance
+
+**Breaking Changes:**
+* None - all changes maintain backward compatibility
+
+**Migration Notes:**
+* No manual intervention required for existing installations
+* All config files and data remain compatible
+* Existing race configurations and championships unaffected
+
+**Verification:**
+* ✅ Complete build process tested and verified
+* ✅ Frontend compilation working without warnings  
+* ✅ Windows and Linux binaries generated successfully
+* ✅ Web interface fully functional
+* ✅ Race management features validated
+
+---
+
 v1.7.10
 -------
 

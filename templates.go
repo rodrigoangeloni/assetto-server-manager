@@ -20,7 +20,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/getsentry/raven-go"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/mattn/go-zglob"
 	"github.com/sirupsen/logrus"
 )

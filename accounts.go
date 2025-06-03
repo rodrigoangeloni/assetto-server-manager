@@ -15,7 +15,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/cj123/sessions"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/sethvargo/go-diceware/diceware"
 	"github.com/sirupsen/logrus"

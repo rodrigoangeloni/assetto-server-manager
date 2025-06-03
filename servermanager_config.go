@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/cj123/sessions"
-	"github.com/etcd-io/bbolt"
 	"github.com/sirupsen/logrus"
+	"go.etcd.io/bbolt"
 	"gopkg.in/yaml.v2"
 )
 

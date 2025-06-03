@@ -21,7 +21,7 @@ import (
 
 	"github.com/cj123/ini"
 	"github.com/dimchansky/utfbom"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/jpillora/longestcommon"
 	"github.com/nfnt/resize"
 	"github.com/sirupsen/logrus"
