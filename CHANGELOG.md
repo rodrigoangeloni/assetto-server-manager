@@ -1,3 +1,34 @@
+v1.7.12 - Build System & Icon Enhancement (2025-06-04)
+--------------------------------------------------------
+
+**Build System Improvements:**
+
+* **Icon Integration**: Added automatic icon embedding in Windows executables
+  - New `versioninfo.json` configuration for executable metadata
+  - Automatic resource compilation using `goversioninfo` tool
+  - Support for custom application icon (`servermanager.ico`)
+  - Version information and copyright details in executable properties
+
+* **Build Process Optimization**:
+  - **Clean Builds**: Automatic cleanup of temporary files (resource.syso, resource.rc)
+  - **Binary Organization**: Executables now organized only in `build/windows/` and `build/linux/`
+  - **Resource Management**: Automatic regeneration of icon resources on each build
+  - **Cross-Platform**: Verified builds for both Windows and Linux
+
+* **Developer Experience**:
+  - Enhanced PowerShell build script with detailed progress indicators
+  - Automatic installation of required build tools (goversioninfo, esc)
+  - Improved error handling and cleanup procedures
+  - Better documentation and build instructions
+
+**Technical Enhancements:**
+* Updated build system to Go 1.24.3 compatibility
+* Improved resource embedding process
+* Enhanced file organization and cleanup
+* Better handling of build dependencies
+
+---
+
 v1.7.11 - Security & Modernization Update (2024-12-27)
 -------------------------------------------------------
 

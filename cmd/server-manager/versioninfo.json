@@ -1,0 +1,41 @@
+{  "FixedFileInfo": {
+    "FileVersion": {
+      "Major": 1,
+      "Minor": 7,
+      "Patch": 12,
+      "Build": 1712
+    },
+    "ProductVersion": {
+      "Major": 1,
+      "Minor": 7,
+      "Patch": 12,
+      "Build": 1712
+    },
+    "FileFlagsMask": "3f",
+    "FileFlags ": "00",
+    "FileOS": "040004",
+    "FileType": "01",
+    "FileSubType": "00"
+  },
+  "StringFileInfo": {
+    "Comments": "Assetto Corsa Server Manager",
+    "CompanyName": "Assetto Server Manager",    "FileDescription": "Assetto Corsa Server Manager",
+    "FileVersion": "1.7.12.0",
+    "InternalName": "server-manager",
+    "LegalCopyright": "Copyright © 2025",
+    "LegalTrademarks": "",
+    "OriginalFilename": "server-manager.exe",
+    "PrivateBuild": "",
+    "ProductName": "Assetto Server Manager",
+    "ProductVersion": "1.7.12.0",
+    "SpecialBuild": ""
+  },
+  "VarFileInfo": {
+    "Translation": {
+      "LangID": "0409",
+      "CharsetID": "04B0"
+    }
+  },
+  "IconPath": "static/img/servermanager.ico",
+  "ManifestPath": ""
+}

@@ -1,6 +1,14 @@
 #!/usr/bin/env pwsh
 # Script de Compilación Automática para Assetto Server Manager
 # Compatible con Windows PowerShell
+#
+# Características especiales:
+# - Limpia automáticamente archivos de recursos (resource.syso, resource.rc) en cada compilación
+#   para asegurar que se use el icono más reciente si se ha cambiado
+# - Genera ejecutables para Windows y Linux
+# - Incluye icono y metadatos de versión en el ejecutable de Windows
+# - Los binarios finales se organizan solo en build/windows/ y build/linux/
+# - Limpieza automática de archivos temporales al inicio y final del proceso
 
 Write-Host "🔨 Iniciando compilación de Assetto Server Manager..." -ForegroundColor Green
 Write-Host "=================================================" -ForegroundColor Cyan
@@ -51,6 +59,34 @@ try {
     exit 1
 }
 
+Write-Host ""
+
+# Paso 0: Limpieza inicial
+Write-Host "🧹 Paso 0: Limpieza inicial..." -ForegroundColor Yellow
+Push-Location "cmd\server-manager"
+
+try {
+    # Eliminar binarios y archivos temporales anteriores
+    $cleanFiles = @("server-manager.exe", "server-manager-linux", "resource.syso", "resource.rc")
+    $cleanedCount = 0
+    
+    foreach ($file in $cleanFiles) {
+        if (Test-Path $file) {
+            Remove-Item $file -Force
+            $cleanedCount++
+        }
+    }
+    
+    if ($cleanedCount -gt 0) {
+        Write-Host "✅ $cleanedCount archivo(s) temporal(es) eliminado(s)" -ForegroundColor Green
+    } else {
+        Write-Host "✅ No hay archivos temporales para limpiar" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "⚠️ Error en limpieza inicial (no crítico)" -ForegroundColor Yellow
+}
+
+Pop-Location
 Write-Host ""
 
 # Paso 1: Instalar dependencias Go
@@ -111,15 +147,62 @@ try {
 
 Write-Host ""
 
-# Paso 4: Compilar aplicación
-Write-Host "⚙️ Paso 4: Compilando aplicación..." -ForegroundColor Yellow
+# Paso 4: Compilar recursos para Windows
+Write-Host "⚙️ Paso 4a: Compilando recursos de Windows..." -ForegroundColor Yellow
+
+try {
+    # Limpiar archivos de recursos anteriores para asegurar que se use el icono actual
+    if (Test-Path "resource.syso") {
+        Remove-Item "resource.syso" -Force
+        Write-Host "🧹 Archivo resource.syso anterior eliminado" -ForegroundColor Green
+    }
+    if (Test-Path "resource.rc") {
+        Remove-Item "resource.rc" -Force
+        Write-Host "🧹 Archivo resource.rc anterior eliminado" -ForegroundColor Green
+    }
+    
+    # Verificar si goversioninfo está disponible
+    try {
+        goversioninfo --help | Out-Null
+        Write-Host "✅ goversioninfo está disponible" -ForegroundColor Green
+        
+        # Compilar recursos si el archivo versioninfo.json existe
+        if (Test-Path "versioninfo.json") {
+            Write-Host "🎨 Generando recursos con icono..." -ForegroundColor Cyan
+            goversioninfo -o resource.syso
+            Write-Host "✅ Recursos con icono generados exitosamente" -ForegroundColor Green
+        } else {
+            Write-Host "⚠️ Archivo versioninfo.json no encontrado, continuando sin icono" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "⚠️ goversioninfo no está disponible. Instalando..." -ForegroundColor Yellow
+        try {
+            go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
+            Write-Host "✅ goversioninfo instalado exitosamente" -ForegroundColor Green
+            
+            if (Test-Path "versioninfo.json") {
+                Write-Host "🎨 Generando recursos con icono..." -ForegroundColor Cyan
+                goversioninfo -o resource.syso
+                Write-Host "✅ Recursos con icono generados exitosamente" -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "⚠️ No se pudo instalar goversioninfo. El ejecutable no tendrá icono." -ForegroundColor Yellow
+        }
+    }
+} catch {
+    Write-Host "⚠️ Error compilando recursos (no crítico)" -ForegroundColor Yellow
+}
+
+Write-Host ""
+
+# Paso 4b: Compilar aplicación
+Write-Host "⚙️ Paso 4b: Compilando aplicación..." -ForegroundColor Yellow
 
 try {
     # Compilar para Windows
     Write-Host "🖥️ Compilando para Windows..." -ForegroundColor Cyan
     go build -o server-manager.exe
-    
-    # Compilar para Linux
+      # Compilar para Linux
     Write-Host "🐧 Compilando para Linux..." -ForegroundColor Cyan
     $env:GOOS = "linux"
     $env:GOARCH = "amd64"
@@ -130,6 +213,12 @@ try {
     $env:GOARCH = "amd64"
     
     Write-Host "✅ Aplicación compilada para ambas plataformas" -ForegroundColor Green
+    
+    # Limpiar archivo de recursos temporal después de la compilación
+    if (Test-Path "resource.syso") {
+        Remove-Item "resource.syso" -Force
+        Write-Host "🧹 Archivo temporal resource.syso eliminado después de compilación" -ForegroundColor Green
+    }
 } catch {
     Write-Host "❌ Error compilando aplicación" -ForegroundColor Red
     Pop-Location
@@ -167,21 +256,27 @@ if (-not (Test-Path "assetto\acServer.exe")) {
 Pop-Location
 Write-Host ""
 
-# Paso 6: Crear releases
-Write-Host "📦 Paso 6: Creando releases..." -ForegroundColor Yellow
+# Paso 6: Crear releases y limpieza
+Write-Host "📦 Paso 6: Creando releases y organizando archivos..." -ForegroundColor Yellow
 Push-Location "cmd\server-manager"
 
 try {
     # Crear directorios de build
     New-Item -ItemType Directory -Force -Path "build\linux", "build\windows" | Out-Null
     
-    # Copiar archivos para release de Linux
+    # Mover archivos para release de Linux (no copiar)
     Copy-Item "config.example.yml" "build\linux\config.yml"
-    Copy-Item "server-manager-linux" "build\linux\server-manager"
+    if (Test-Path "server-manager-linux") {
+        Move-Item "server-manager-linux" "build\linux\server-manager" -Force
+        Write-Host "✅ Binario de Linux movido a build/linux/" -ForegroundColor Green
+    }
     
-    # Copiar archivos para release de Windows
+    # Mover archivos para release de Windows (no copiar)
     Copy-Item "config.example.yml" "build\windows\config.yml"
-    Copy-Item "server-manager.exe" "build\windows\"
+    if (Test-Path "server-manager.exe") {
+        Move-Item "server-manager.exe" "build\windows\" -Force
+        Write-Host "✅ Binario de Windows movido a build/windows/" -ForegroundColor Green
+    }
     
     # Copiar documentación
     Copy-Item "..\..\LICENSE" "build\LICENSE.txt"
@@ -189,8 +284,21 @@ try {
     Copy-Item "..\..\INSTALL.txt" "build\"
     Copy-Item "..\..\README.md" "build\README.txt"
     Copy-Item "..\..\BUILD_GUIDE.md" "build\"
+      Write-Host "✅ Releases creados en build/linux y build/windows" -ForegroundColor Green
     
-    Write-Host "✅ Releases creados en build/linux y build/windows" -ForegroundColor Green
+    # Limpieza final de archivos temporales
+    Write-Host "🧹 Limpiando archivos temporales..." -ForegroundColor Cyan
+    
+    # Eliminar binarios que puedan haber quedado en el directorio raíz
+    $tempFiles = @("server-manager.exe", "server-manager-linux", "resource.syso", "resource.rc")
+    foreach ($file in $tempFiles) {
+        if (Test-Path $file) {
+            Remove-Item $file -Force
+            Write-Host "  ✅ $file eliminado" -ForegroundColor Green
+        }
+    }
+    
+    Write-Host "✅ Limpieza completada" -ForegroundColor Green
 } catch {
     Write-Host "⚠️ Error creando releases (no crítico)" -ForegroundColor Yellow
 }
@@ -203,13 +311,13 @@ Write-Host "🎉 ¡COMPILACIÓN COMPLETADA EXITOSAMENTE!" -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "📁 Archivos generados:" -ForegroundColor White
-Write-Host "  • cmd\server-manager\server-manager.exe     (Windows)" -ForegroundColor Cyan
-Write-Host "  • cmd\server-manager\server-manager-linux   (Linux)" -ForegroundColor Cyan
-Write-Host "  • cmd\server-manager\config.yml             (Configuración)" -ForegroundColor Cyan
-Write-Host "  • cmd\server-manager\build\                 (Releases completos)" -ForegroundColor Cyan
+Write-Host "  • cmd\server-manager\build\windows\server-manager.exe     (Windows)" -ForegroundColor Cyan
+Write-Host "  • cmd\server-manager\build\linux\server-manager         (Linux)" -ForegroundColor Cyan
+Write-Host "  • cmd\server-manager\config.yml                         (Configuración)" -ForegroundColor Cyan
+Write-Host "  • cmd\server-manager\build\                             (Releases completos)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "🚀 Para ejecutar:" -ForegroundColor White
-Write-Host "  cd cmd\server-manager" -ForegroundColor Yellow
+Write-Host "  cd cmd\server-manager\build\windows" -ForegroundColor Yellow
 Write-Host "  .\server-manager.exe" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "🌐 Interfaz web:" -ForegroundColor White
