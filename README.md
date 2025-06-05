@@ -44,7 +44,7 @@
 * **Accounts system** with different permissions levels
 * **Linux and Windows Support** with optimized builds for both platforms
 
-**If you like Assetto Server Manager, please consider supporting us with a [donation](https://www.paypal.com/biz/fund?id=9LE45G9P3KPQW)!**
+**If you like Assetto Server Manager, please consider supporting us with a [donation](https://www.paypal.com/ncp/payment/RSDZTT23ZE4F4)!**
 
 ## 🔒 Security & Modernization (v1.7.12)
 

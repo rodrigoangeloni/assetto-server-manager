@@ -9,7 +9,7 @@ However, if you have any problems, please don't hesitate to ask questions in one
 
 We'd also like to ask that you consider donating to help fund the development of Server Manager. We're a two
 person team who dedicate a lot of our time to make cool things for the community. If you can help out, we'd
-really appreciate it. You can donate at: https://www.paypal.com/biz/fund?id=9LE45G9P3KPQW
+really appreciate it. You can donate at: https://www.paypal.com/ncp/payment/RSDZTT23ZE4F4
 
 Right! With that let's begin setting up the server.
 
