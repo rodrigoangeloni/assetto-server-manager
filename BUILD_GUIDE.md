@@ -8,7 +8,7 @@ Esta guía te llevará paso a paso para compilar **Assetto Server Manager** desd
 
 | Software | Versión Mínima | Versión Probada | Enlace |
 |----------|----------------|-----------------|---------|
-| **Go** | 1.20+ | 1.24.3 | [golang.org](https://golang.org/dl/) |
+| **Go** | 1.22.0+ | 1.24.3 | [golang.org](https://golang.org/dl/) |
 | **Node.js** | 18+ | 22.15.0 | [nodejs.org](https://nodejs.org/) |
 | **Git** | Cualquiera | Última | [git-scm.com](https://git-scm.com/) |
 | **Make** | Cualquiera | Última | Ver instalación abajo |
@@ -17,7 +17,7 @@ Esta guía te llevará paso a paso para compilar **Assetto Server Manager** desd
 
 ```bash
 # Verificar versiones instaladas
-go version          # Should show go1.20+
+go version          # Should show go1.22+
 node --version      # Should show v18+
 npm --version       # Should show 8+
 git --version       # Any version

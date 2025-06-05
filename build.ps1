@@ -28,10 +28,22 @@ $env:CGO_ENABLED = '0'
 Write-Host "🔍 Verificando dependencias..." -ForegroundColor Yellow
 
 try {
-    $goVersion = go version
-    Write-Host "✅ Go: $goVersion" -ForegroundColor Green
+    $goVersionOutput = go version
+    $goVersionString = ($goVersionOutput -split ' ')[2] # Extrae algo como "go1.21.1"
+    $goVersionInstalled = $goVersionString.Substring(2) # Extrae "1.21.1"
+    $requiredGoVersion = "1.22.0"
+
+    if ([version]$goVersionInstalled -lt [version]$requiredGoVersion) {
+        Write-Host "❌ Error: Versión de Go incorrecta." -ForegroundColor Red
+        Write-Host "   Instalada: $($goVersionInstalled)" -ForegroundColor Red
+        Write-Host "   Requerida: $($requiredGoVersion) o superior." -ForegroundColor Red
+        Write-Host "   Por favor, actualiza Go desde https://golang.org/dl/" -ForegroundColor Yellow
+        exit 1
+    }
+    Write-Host "✅ Go: $goVersionInstalled (Cumple >= $requiredGoVersion)" -ForegroundColor Green
 } catch {
-    Write-Host "❌ Go no está instalado o no está en PATH" -ForegroundColor Red
+    Write-Host "❌ Go no está instalado o no está en PATH." -ForegroundColor Red
+    Write-Host "   Por favor, instálalo desde https://golang.org/dl/ y asegúrate de que esté en tu PATH." -ForegroundColor Yellow
     exit 1
 }
 
@@ -67,12 +79,13 @@ Push-Location "cmd\server-manager"
 
 try {
     # Eliminar binarios y archivos temporales anteriores
-    $cleanFiles = @("server-manager.exe", "server-manager-linux", "resource.syso", "resource.rc")
+    $cleanFiles = @("server-manager*.exe", "server-manager*-linux", "resource.syso", "resource.rc")
     $cleanedCount = 0
     
-    foreach ($file in $cleanFiles) {
-        if (Test-Path $file) {
-            Remove-Item $file -Force
+    foreach ($pattern in $cleanFiles) {
+        $files = Get-ChildItem -Path $pattern -ErrorAction SilentlyContinue
+        foreach ($file in $files) {
+            Remove-Item $file.FullName -Force
             $cleanedCount++
         }
     }
@@ -198,21 +211,33 @@ Write-Host ""
 # Paso 4b: Compilar aplicación
 Write-Host "⚙️ Paso 4b: Compilando aplicación..." -ForegroundColor Yellow
 
+# Leer versión del archivo versioninfo.json
+$version = "unknown"
+try {
+    if (Test-Path "versioninfo.json") {
+        $versionInfo = Get-Content "versioninfo.json" | ConvertFrom-Json
+        $version = "v$($versionInfo.StringFileInfo.FileVersion -replace '\.0$', '')"
+        Write-Host "📋 Versión detectada: $version" -ForegroundColor Cyan
+    }
+} catch {
+    Write-Host "⚠️ No se pudo leer la versión, usando nombre por defecto" -ForegroundColor Yellow
+    $version = "v1.7.12"
+}
+
 try {
     # Compilar para Windows
     Write-Host "🖥️ Compilando para Windows..." -ForegroundColor Cyan
-    go build -o server-manager.exe
+    go build -o "server-manager_$version.exe"
       # Compilar para Linux
     Write-Host "🐧 Compilando para Linux..." -ForegroundColor Cyan
     $env:GOOS = "linux"
     $env:GOARCH = "amd64"
-    go build -o server-manager-linux
+    go build -o "server-manager_$version-linux"
     
     # Restaurar variables para Windows
     $env:GOOS = "windows"
     $env:GOARCH = "amd64"
-    
-    Write-Host "✅ Aplicación compilada para ambas plataformas" -ForegroundColor Green
+      Write-Host "✅ Aplicación compilada para ambas plataformas" -ForegroundColor Green
     
     # Limpiar archivo de recursos temporal después de la compilación
     if (Test-Path "resource.syso") {
@@ -263,19 +288,21 @@ Push-Location "cmd\server-manager"
 try {
     # Crear directorios de build
     New-Item -ItemType Directory -Force -Path "build\linux", "build\windows" | Out-Null
-    
-    # Mover archivos para release de Linux (no copiar)
+      # Buscar y mover archivos para release de Linux
     Copy-Item "config.example.yml" "build\linux\config.yml"
-    if (Test-Path "server-manager-linux") {
-        Move-Item "server-manager-linux" "build\linux\server-manager" -Force
-        Write-Host "✅ Binario de Linux movido a build/linux/" -ForegroundColor Green
+    $linuxBinary = Get-ChildItem -Path "server-manager*-linux" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($linuxBinary) {
+        $linuxFinalName = $linuxBinary.Name -replace "-linux$", ""
+        Move-Item $linuxBinary.FullName "build\linux\$linuxFinalName" -Force
+        Write-Host "✅ Binario de Linux ($($linuxBinary.Name)) movido a build/linux/$linuxFinalName" -ForegroundColor Green
     }
     
-    # Mover archivos para release de Windows (no copiar)
+    # Buscar y mover archivos para release de Windows
     Copy-Item "config.example.yml" "build\windows\config.yml"
-    if (Test-Path "server-manager.exe") {
-        Move-Item "server-manager.exe" "build\windows\" -Force
-        Write-Host "✅ Binario de Windows movido a build/windows/" -ForegroundColor Green
+    $windowsBinary = Get-ChildItem -Path "server-manager*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($windowsBinary) {
+        Move-Item $windowsBinary.FullName "build\windows\$($windowsBinary.Name)" -Force
+        Write-Host "✅ Binario de Windows ($($windowsBinary.Name)) movido a build/windows/$($windowsBinary.Name)" -ForegroundColor Green
     }
     
     # Copiar documentación
@@ -285,16 +312,16 @@ try {
     Copy-Item "..\..\README.md" "build\README.txt"
     Copy-Item "..\..\BUILD_GUIDE.md" "build\"
       Write-Host "✅ Releases creados en build/linux y build/windows" -ForegroundColor Green
-    
-    # Limpieza final de archivos temporales
+      # Limpieza final de archivos temporales
     Write-Host "🧹 Limpiando archivos temporales..." -ForegroundColor Cyan
     
     # Eliminar binarios que puedan haber quedado en el directorio raíz
-    $tempFiles = @("server-manager.exe", "server-manager-linux", "resource.syso", "resource.rc")
-    foreach ($file in $tempFiles) {
-        if (Test-Path $file) {
-            Remove-Item $file -Force
-            Write-Host "  ✅ $file eliminado" -ForegroundColor Green
+    $tempPatterns = @("server-manager*.exe", "server-manager*-linux", "resource.syso", "resource.rc")
+    foreach ($pattern in $tempPatterns) {
+        $files = Get-ChildItem -Path $pattern -ErrorAction SilentlyContinue
+        foreach ($file in $files) {
+            Remove-Item $file.FullName -Force
+            Write-Host "  ✅ $($file.Name) eliminado" -ForegroundColor Green
         }
     }
     
@@ -311,14 +338,34 @@ Write-Host "🎉 ¡COMPILACIÓN COMPLETADA EXITOSAMENTE!" -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "📁 Archivos generados:" -ForegroundColor White
-Write-Host "  • cmd\server-manager\build\windows\server-manager.exe     (Windows)" -ForegroundColor Cyan
-Write-Host "  • cmd\server-manager\build\linux\server-manager         (Linux)" -ForegroundColor Cyan
+
+# Obtener nombres reales de los archivos generados
+$windowsFile = Get-ChildItem -Path "build\windows\server-manager*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+$linuxFile = Get-ChildItem -Path "build\linux\server-manager*" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+if ($windowsFile) {
+    Write-Host "  • cmd\server-manager\build\windows\$($windowsFile.Name)     (Windows)" -ForegroundColor Cyan
+} else {
+    Write-Host "  • cmd\server-manager\build\windows\server-manager.exe     (Windows)" -ForegroundColor Cyan
+}
+
+if ($linuxFile) {
+    Write-Host "  • cmd\server-manager\build\linux\$($linuxFile.Name)         (Linux)" -ForegroundColor Cyan
+} else {
+    Write-Host "  • cmd\server-manager\build\linux\server-manager         (Linux)" -ForegroundColor Cyan
+}
+
 Write-Host "  • cmd\server-manager\config.yml                         (Configuración)" -ForegroundColor Cyan
 Write-Host "  • cmd\server-manager\build\                             (Releases completos)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "🚀 Para ejecutar:" -ForegroundColor White
 Write-Host "  cd cmd\server-manager\build\windows" -ForegroundColor Yellow
-Write-Host "  .\server-manager.exe" -ForegroundColor Yellow
+
+if ($windowsFile) {
+    Write-Host "  .\$($windowsFile.Name)" -ForegroundColor Yellow
+} else {
+    Write-Host "  .\server-manager.exe" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "🌐 Interfaz web:" -ForegroundColor White
 Write-Host "  http://localhost:8772" -ForegroundColor Yellow

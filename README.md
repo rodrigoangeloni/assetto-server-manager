@@ -1,5 +1,9 @@
 # 🏎️ Assetto Server Manager v1.7.12 - Complete English Guide
 
+## 🌍 Languages / Idiomas
+- 🇺🇸 **English**: You are reading it now
+- 🇪🇸 **Español**: [README-ES.md](README-ES.md)
+
 ## 📋 Table of Contents
 - [🚀 Introduction](#-introduction)
 - [💻 Installation](#-installation)
